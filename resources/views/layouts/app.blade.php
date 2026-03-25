@@ -57,9 +57,17 @@
                     <span class="sb-item-icon">C</span>
                     <span>Pelanggan</span>
                 </a>
+                <a href="{{ route('expense_categories.index') }}" class="sb-item {{ request()->routeIs('expense_categories.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">B</span>
+                    <span>Kategori Biaya</span>
+                </a>
+                <a href="{{ route('expenses.index') }}" class="sb-item {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">O</span>
+                    <span>Biaya Operasional</span>
+                </a>
             @endif
 
-            @if (in_array($role, ['admin', 'kasir'], true))
+            @if ($role === 'kasir')
                 <a href="{{ route('transactions.index') }}" class="sb-item {{ request()->routeIs('transactions.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">T</span>
                     <span>Transaksi</span>
@@ -73,7 +81,11 @@
             @if (in_array($role, ['admin', 'owner'], true))
                 <a href="{{ route('reports.sales') }}" class="sb-item {{ request()->routeIs('reports.sales') ? 'active' : '' }}">
                     <span class="sb-item-icon">L</span>
-                    <span>Laporan</span>
+                    <span>Laporan Penjualan</span>
+                </a>
+                <a href="{{ route('reports.expenses') }}" class="sb-item {{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                    <span class="sb-item-icon">B</span>
+                    <span>Laporan Pengeluaran</span>
                 </a>
             @endif
 

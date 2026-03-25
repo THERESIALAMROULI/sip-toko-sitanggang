@@ -18,12 +18,14 @@ class StoreTransactionRequest extends FormRequest
         return [
             'customer_id' => [
                 'nullable',
-                'exists:customers,id',
-                'required_if:payment_type,credit',
+                'exists:pelanggans,id',
+                'required_if:payment_type,utang',
             ],
-            'payment_type' => ['required', Rule::in(['cash', 'transfer', 'qris', 'credit'])],
+            'payment_type' => ['required', Rule::in(['tunai', 'utang'])],
+            'due_date' => ['nullable', 'date', 'after_or_equal:today', 'required_if:payment_type,utang'],
+            'cash_received' => ['nullable', 'numeric', 'min:0', 'required_if:payment_type,tunai'],
             'products' => ['required', 'array', 'min:1'],
-            'products.*.product_id' => ['required', 'exists:products,id', 'distinct'],
+            'products.*.product_id' => ['required', 'exists:produks,id', 'distinct'],
             'products.*.quantity' => ['required', 'integer', 'min:0'],
         ];
     }

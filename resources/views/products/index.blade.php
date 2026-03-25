@@ -22,8 +22,11 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Produk</th>
-                        <th>Harga</th>
+                        <th>Kategori</th>
+                        <th>Harga Beli</th>
+                        <th>Harga Jual</th>
                         <th>Stok</th>
+                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                     </thead>
@@ -31,15 +34,24 @@
                     @foreach ($products as $product)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $product->name }}</td>
-                            <td class="mono">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                            <td>{{ $product->nama }}</td>
+                            <td>{{ $product->kategori->nama ?? '-' }}</td>
+                            <td class="mono">Rp {{ number_format($product->harga_beli, 0, ',', '.') }}</td>
+                            <td class="mono">Rp {{ number_format($product->harga_jual, 0, ',', '.') }}</td>
                             <td>
-                                @if ($product->stock <= 0)
+                                @if ($product->stok <= 0)
                                     <span class="badge badge-red">Habis (0)</span>
-                                @elseif ($product->stock <= 5)
-                                    <span class="badge badge-amber">Rendah ({{ $product->stock }})</span>
+                                @elseif ($product->stok <= $product->stok_minimum)
+                                    <span class="badge badge-amber">Rendah ({{ $product->stok }})</span>
                                 @else
-                                    <span class="badge badge-green">{{ $product->stock }} tersedia</span>
+                                    <span class="badge badge-green">{{ $product->stok }} tersedia</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($product->aktif)
+                                    <span class="badge badge-green">Aktif</span>
+                                @else
+                                    <span class="badge badge-gray">Nonaktif</span>
                                 @endif
                             </td>
                             <td>

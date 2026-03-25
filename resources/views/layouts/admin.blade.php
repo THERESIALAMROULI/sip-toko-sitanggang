@@ -46,6 +46,18 @@
             </a>
 
             @if ($role === 'admin')
+                <a href="{{ route('users.index') }}" class="sb-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">U</span>
+                    <span>Manajemen User</span>
+                </a>
+                <a href="{{ route('kategoris.index') }}" class="sb-item {{ request()->routeIs('kategoris.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">K</span>
+                    <span>Kategori</span>
+                </a>
+                <a href="{{ route('suppliers.index') }}" class="sb-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">S</span>
+                    <span>Supplier</span>
+                </a>
                 <a href="{{ route('products.index') }}" class="sb-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">P</span>
                     <span>Produk</span>
@@ -54,9 +66,17 @@
                     <span class="sb-item-icon">C</span>
                     <span>Pelanggan</span>
                 </a>
+                <a href="{{ route('expense_categories.index') }}" class="sb-item {{ request()->routeIs('expense_categories.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">B</span>
+                    <span>Kategori Biaya</span>
+                </a>
+                <a href="{{ route('expenses.index') }}" class="sb-item {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">O</span>
+                    <span>Biaya Operasional</span>
+                </a>
             @endif
 
-            @if (in_array($role, ['admin', 'kasir'], true))
+            @if ($role === 'kasir')
                 <a href="{{ route('transactions.index') }}" class="sb-item {{ request()->routeIs('transactions.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">T</span>
                     <span>Transaksi</span>
@@ -65,12 +85,35 @@
                     <span class="sb-item-icon">R</span>
                     <span>Piutang</span>
                 </a>
+                <a href="{{ route('stocks.check') }}" class="sb-item {{ request()->routeIs('stocks.check') ? 'active' : '' }}">
+                    <span class="sb-item-icon">C</span>
+                    <span>Cek Stok</span>
+                </a>
+            @endif
+
+            @if ($role === 'admin')
+                <a href="{{ route('stok_histories.index') }}" class="sb-item {{ request()->routeIs('stok_histories.*') ? 'active' : '' }}">
+                    <span class="sb-item-icon">H</span>
+                    <span>Manajemen Stok</span>
+                </a>
             @endif
 
             @if (in_array($role, ['admin', 'owner'], true))
                 <a href="{{ route('reports.sales') }}" class="sb-item {{ request()->routeIs('reports.sales') ? 'active' : '' }}">
                     <span class="sb-item-icon">L</span>
-                    <span>Laporan</span>
+                    <span>Laporan Penjualan</span>
+                </a>
+                <a href="{{ route('reports.receivables') }}" class="sb-item {{ request()->routeIs('reports.receivables') ? 'active' : '' }}">
+                    <span class="sb-item-icon">U</span>
+                    <span>Laporan Utang</span>
+                </a>
+                <a href="{{ route('reports.stock') }}" class="sb-item {{ request()->routeIs('reports.stock') ? 'active' : '' }}">
+                    <span class="sb-item-icon">S</span>
+                    <span>Laporan Stok</span>
+                </a>
+                <a href="{{ route('reports.expenses') }}" class="sb-item {{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                    <span class="sb-item-icon">B</span>
+                    <span>Laporan Pengeluaran</span>
                 </a>
             @endif
 

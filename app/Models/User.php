@@ -4,8 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
 
 class User extends Authenticatable
 {
@@ -20,7 +22,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
+        'nama',
         'role',
+        'status',
         'password',
     ];
 
@@ -55,5 +60,24 @@ class User extends Authenticatable
     public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles, true);
+    }
+
+    public function getNameAttribute($value): ?string
+    {
+        return $value ?? $this->attributes['nama'] ?? null;
+    }
+
+    public function setNameAttribute($value): void
+    {
+        $this->attributes['name'] = $value;
+
+        if (Schema::hasColumn($this->getTable(), 'nama')) {
+            $this->attributes['nama'] = $value;
+        }
+    }
+
+    public function stokHistories(): HasMany
+    {
+        return $this->hasMany(RiwayatStok::class, 'user_id');
     }
 }

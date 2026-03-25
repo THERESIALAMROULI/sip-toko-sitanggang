@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,31 +12,85 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->enum('role', ['admin', 'kasir', 'owner'])->default('kasir');
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('users')) {
+            Schema::create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->unique();
+                $table->enum('role', ['admin', 'kasir', 'owner'])->default('kasir');
+                $table->timestamp('email_verified_at')->nullable();
+                $table->string('password');
+                $table->rememberToken();
+                $table->timestamps();
+            });
+        } else {
+            if (! Schema::hasColumn('users', 'name')) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->string('name')->nullable()->after('id');
+                });
+            }
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+            if (! Schema::hasColumn('users', 'email')) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->string('email')->nullable()->after('name');
+                });
+            }
 
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
+            if (! Schema::hasColumn('users', 'email_verified_at')) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->timestamp('email_verified_at')->nullable()->after('email');
+                });
+            }
+
+            if (! Schema::hasColumn('users', 'role')) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->enum('role', ['admin', 'kasir', 'owner'])->default('kasir');
+                });
+            }
+
+            if (Schema::hasColumn('users', 'nama')) {
+                DB::statement("UPDATE users SET name = COALESCE(NULLIF(name, ''), nama)");
+            } elseif (Schema::hasColumn('users', 'username')) {
+                DB::statement("UPDATE users SET name = COALESCE(NULLIF(name, ''), username)");
+            }
+
+            if (Schema::hasColumn('users', 'username')) {
+                DB::statement("UPDATE users SET email = CONCAT(username, '@local.test') WHERE (email IS NULL OR email = '') AND username IS NOT NULL AND username <> ''");
+            }
+
+            DB::statement("UPDATE users SET email = CONCAT('user', id, '@local.test') WHERE email IS NULL OR email = ''");
+
+            $emailUniqueIndexExists = DB::table('information_schema.statistics')
+                ->where('table_schema', DB::raw('DATABASE()'))
+                ->where('table_name', 'users')
+                ->where('index_name', 'users_email_unique')
+                ->exists();
+
+            if (! $emailUniqueIndexExists) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->unique('email');
+                });
+            }
+        }
+
+        if (! Schema::hasTable('password_reset_tokens')) {
+            Schema::create('password_reset_tokens', function (Blueprint $table) {
+                $table->string('email')->primary();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('sessions')) {
+            Schema::create('sessions', function (Blueprint $table) {
+                $table->string('id')->primary();
+                $table->foreignId('user_id')->nullable()->index();
+                $table->string('ip_address', 45)->nullable();
+                $table->text('user_agent')->nullable();
+                $table->longText('payload');
+                $table->integer('last_activity')->index();
+            });
+        }
     }
 
     /**
