@@ -95,7 +95,7 @@ class LaporanController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('reports.sales', compact(
+        return view('laporan.sales', compact(
             'transactions',
             'totalSales',
             'totalTransactions',
@@ -158,7 +158,7 @@ class LaporanController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('reports.receivables', compact(
+        return view('laporan.receivables', compact(
             'receivables',
             'totalUnpaid',
             'totalPaid',
@@ -228,7 +228,7 @@ class LaporanController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('reports.stock', compact(
+        return view('laporan.stock', compact(
             'products',
             'totalProducts',
             'lowStockCount',
@@ -310,7 +310,7 @@ class LaporanController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('reports.expenses', compact(
+        return view('laporan.expenses', compact(
             'expenses',
             'totalExpense',
             'totalSales',

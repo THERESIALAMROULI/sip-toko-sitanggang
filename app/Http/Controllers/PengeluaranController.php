@@ -64,7 +64,7 @@ class PengeluaranController extends Controller
             'end_date' => $validated['end_date'] ?? null,
         ];
 
-        return view('expenses.index', compact(
+        return view('pengeluaran.index', compact(
             'expenses',
             'totalExpense',
             'expenseCategories',
@@ -79,7 +79,7 @@ class PengeluaranController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('expenses.create', compact('expenseCategories'));
+        return view('pengeluaran.create', compact('expenseCategories'));
     }
 
     public function store(Request $request)
@@ -111,7 +111,7 @@ class PengeluaranController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('expenses.edit', compact('expense', 'expenseCategories'));
+        return view('pengeluaran.edit', compact('expense', 'expenseCategories'));
     }
 
     public function update(Request $request, Pengeluaran $expense)

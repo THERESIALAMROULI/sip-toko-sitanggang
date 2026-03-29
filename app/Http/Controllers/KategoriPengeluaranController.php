@@ -15,12 +15,12 @@ class KategoriPengeluaranController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('expense_categories.index', compact('expenseCategories'));
+        return view('kategori_pengeluaran.index', compact('expenseCategories'));
     }
 
     public function create()
     {
-        return view('expense_categories.create');
+        return view('kategori_pengeluaran.create');
     }
 
     public function store(Request $request)
@@ -41,7 +41,7 @@ class KategoriPengeluaranController extends Controller
 
     public function edit(KategoriPengeluaran $expenseCategory)
     {
-        return view('expense_categories.edit', compact('expenseCategory'));
+        return view('kategori_pengeluaran.edit', compact('expenseCategory'));
     }
 
     public function update(Request $request, KategoriPengeluaran $expenseCategory)

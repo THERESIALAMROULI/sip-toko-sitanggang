@@ -39,6 +39,6 @@ class RiwayatStok extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Pengguna::class, 'user_id');
     }
 }

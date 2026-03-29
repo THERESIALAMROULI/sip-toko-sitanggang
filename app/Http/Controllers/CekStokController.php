@@ -59,6 +59,6 @@ class CekStokController extends Controller
             'status' => $validated['status'] ?? null,
         ];
 
-        return view('stocks.check', compact('products', 'kategoris', 'filters'));
+        return view('stok.check', compact('products', 'kategoris', 'filters'));
     }
 }

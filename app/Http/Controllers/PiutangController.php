@@ -80,7 +80,7 @@ class PiutangController extends Controller
             'overdue_only' => $validated['overdue_only'] ?? null,
         ];
 
-        return view('receivables.index', compact(
+        return view('piutang.index', compact(
             'receivables',
             'customers',
             'summaryUnpaidAmount',
@@ -106,7 +106,7 @@ class PiutangController extends Controller
     {
         $receivable->load('transaction.customer');
 
-        return view('receivables.edit', compact('receivable'));
+        return view('piutang.edit', compact('receivable'));
     }
 
     public function update(Request $request, Piutang $receivable)

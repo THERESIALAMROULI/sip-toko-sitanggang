@@ -10,12 +10,12 @@ class PelangganController extends Controller
     public function index()
     {
         $customers = Pelanggan::query()->orderBy('nama')->get();
-        return view('customers.index', compact('customers'));
+        return view('pelanggan.index', compact('customers'));
     }
 
     public function create()
     {
-        return view('customers.create');
+        return view('pelanggan.create');
     }
 
     public function store(Request $request)
@@ -34,7 +34,7 @@ class PelangganController extends Controller
 
     public function edit(Pelanggan $customer)
     {
-        return view('customers.edit', compact('customer'));
+        return view('pelanggan.edit', compact('customer'));
     }
 
     public function update(Request $request, Pelanggan $customer)

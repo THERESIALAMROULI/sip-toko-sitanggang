@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $this->seedUser('theresia0424@gmail.com', 'Admin User', 'admin', 'admin456@!!!');
+        $this->seedUser('theresia0424@gmail.com', 'Admin User', 'admin', 'admin456@!!!', 'admin');
         $this->seedUser('kasir@example.com', 'Bony', 'kasir', 'kasir789@!!!');
         $this->seedUser('owner@example.com', 'Owner User', 'owner', 'owner123@!!!');
 
@@ -170,9 +170,9 @@ class DatabaseSeeder extends Seeder
         $this->seedSampleTransactions();
     }
 
-    private function seedUser(string $email, string $name, string $role, string $plainPassword): void
+    private function seedUser(string $email, string $name, string $role, string $plainPassword, ?string $usernameOverride = null): void
     {
-        $username = strstr($email, '@', true) ?: $email;
+        $username = $usernameOverride ?: (strstr($email, '@', true) ?: $email);
 
         $payload = [
             'email' => $email,

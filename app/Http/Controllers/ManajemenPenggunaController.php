@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Pengguna;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
@@ -20,7 +20,7 @@ class ManajemenPenggunaController extends Controller
             'status' => ['nullable', 'in:aktif,nonaktif'],
         ]);
 
-        $usersQuery = User::query();
+        $usersQuery = Pengguna::query();
 
         if (! empty($validated['q'])) {
             $search = trim($validated['q']);
@@ -54,7 +54,7 @@ class ManajemenPenggunaController extends Controller
             'status' => $validated['status'] ?? null,
         ];
 
-        return view('users.index', compact('users', 'filters', 'hasStatusColumn', 'hasUsernameColumn'));
+        return view('pengguna.index', compact('users', 'filters', 'hasStatusColumn', 'hasUsernameColumn'));
     }
 
     public function create()
@@ -62,7 +62,7 @@ class ManajemenPenggunaController extends Controller
         $hasStatusColumn = Schema::hasColumn('users', 'status');
         $hasUsernameColumn = Schema::hasColumn('users', 'username');
 
-        return view('users.create', compact('hasStatusColumn', 'hasUsernameColumn'));
+        return view('pengguna.create', compact('hasStatusColumn', 'hasUsernameColumn'));
     }
 
     public function store(Request $request)
@@ -103,21 +103,21 @@ class ManajemenPenggunaController extends Controller
             $payload['status'] = $validated['status'];
         }
 
-        User::create($payload);
+        Pengguna::create($payload);
 
         return redirect()->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
 
-    public function edit(User $user)
+    public function edit(Pengguna $user)
     {
         $hasStatusColumn = Schema::hasColumn('users', 'status');
         $hasUsernameColumn = Schema::hasColumn('users', 'username');
 
-        return view('users.edit', compact('user', 'hasStatusColumn', 'hasUsernameColumn'));
+        return view('pengguna.edit', compact('user', 'hasStatusColumn', 'hasUsernameColumn'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, Pengguna $user)
     {
         $rules = [
             'name' => ['required', 'string', 'max:100'],
@@ -164,7 +164,7 @@ class ManajemenPenggunaController extends Controller
             ->with('success', 'User berhasil diperbarui.');
     }
 
-    public function toggleStatus(User $user)
+    public function toggleStatus(Pengguna $user)
     {
         if (! Schema::hasColumn('users', 'status')) {
             return redirect()->route('users.index')
@@ -183,7 +183,7 @@ class ManajemenPenggunaController extends Controller
             ->with('success', 'Status user berhasil diperbarui.');
     }
 
-    public function destroy(User $user)
+    public function destroy(Pengguna $user)
     {
         if ((int) $user->id === (int) auth()->id()) {
             return redirect()->route('users.index')

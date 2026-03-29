@@ -15,7 +15,7 @@ class ProdukController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('products.index', compact('products'));
+        return view('produk.index', compact('products'));
     }
 
     public function create()
@@ -24,7 +24,7 @@ class ProdukController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('products.create', compact('kategoris'));
+        return view('produk.create', compact('kategoris'));
     }
 
     public function store(Request $request)
@@ -53,7 +53,7 @@ class ProdukController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('products.edit', compact('product', 'kategoris'));
+        return view('produk.edit', compact('product', 'kategoris'));
     }
 
     public function update(Request $request, Produk $product)

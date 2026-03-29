@@ -14,12 +14,12 @@ class PemasokController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('suppliers.index', compact('suppliers'));
+        return view('pemasok.index', compact('suppliers'));
     }
 
     public function create()
     {
-        return view('suppliers.create');
+        return view('pemasok.create');
     }
 
     public function store(Request $request)
@@ -42,7 +42,7 @@ class PemasokController extends Controller
 
     public function edit(Pemasok $supplier)
     {
-        return view('suppliers.edit', compact('supplier'));
+        return view('pemasok.edit', compact('supplier'));
     }
 
     public function update(Request $request, Pemasok $supplier)

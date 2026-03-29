@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTransactionRequest;
+use App\Http\Requests\SimpanTransaksiRequest;
 use App\Models\Pelanggan;
 use App\Models\Produk;
 use App\Models\Piutang;
@@ -62,7 +62,7 @@ class PenjualanController extends Controller
             'end_date' => $validated['end_date'] ?? null,
         ];
 
-        return view('transactions.index', compact('transactions', 'filters'));
+        return view('penjualan.index', compact('transactions', 'filters'));
     }
 
     public function create()
@@ -74,17 +74,17 @@ class PenjualanController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('transactions.create', compact('products', 'customers'));
+        return view('penjualan.create', compact('products', 'customers'));
     }
 
     public function show(Penjualan $transaction)
     {
         $transaction->load(['customer', 'details.product', 'receivable', 'user']);
 
-        return view('transactions.show', compact('transaction'));
+        return view('penjualan.show', compact('transaction'));
     }
 
-    public function store(StoreTransactionRequest $request)
+    public function store(SimpanTransaksiRequest $request)
     {
         $validated = $request->validated();
 
