@@ -10,6 +10,8 @@ class KategoriPengeluaran extends Model
 {
     use HasFactory;
 
+    protected $table = 'expense_categories';
+
     protected $fillable = [
         'nama',
         'deskripsi',
