@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained()
                 ->onDelete('set null');
 
-            $table->dateTime('transaction_date'); // ✅ tanggal & jam transaksi
+            $table->dateTime('transaction_date'); // tanggal & jam transaksi
             $table->decimal('total', 12, 2)->default(0);
             $table->enum('payment_type', ['cash', 'transfer', 'qris', 'credit']);
 
