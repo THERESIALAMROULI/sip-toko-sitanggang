@@ -1,39 +1,38 @@
 <?php
 
-use App\Http\Controllers\Autentikasi\KonfirmasiKataSandiController;
-use App\Http\Controllers\Autentikasi\NotifikasiVerifikasiSurelController;
-use App\Http\Controllers\Autentikasi\PromptVerifikasiSurelController;
+// Mengimpor class atau helper yang dibutuhkan pada file ini.
 use App\Http\Controllers\Autentikasi\KataSandiController;
+// Mengimpor class atau helper yang dibutuhkan pada file ini.
 use App\Http\Controllers\Autentikasi\SesiMasukController;
-use App\Http\Controllers\Autentikasi\VerifikasiSurelController;
+// Mengimpor class atau helper yang dibutuhkan pada file ini.
 use Illuminate\Support\Facades\Route;
 
+// Route pada grup guest hanya bisa diakses saat pengguna belum login.
+// Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
 Route::middleware('guest')->group(function () {
+    // Menampilkan halaman login.
+    // Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
     Route::get('login', [SesiMasukController::class, 'create'])
+        // Memberikan nama route agar mudah dipanggil dari controller atau view.
         ->name('login');
 
+    // Memproses data login yang dikirim dari form.
+    // Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
     Route::post('login', [SesiMasukController::class, 'store']);
+// Menutup struktur atau rangkaian proses pada blok sebelumnya.
 });
 
+// Route pada grup auth hanya bisa diakses oleh pengguna yang sudah login.
+// Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
 Route::middleware('auth')->group(function () {
-    Route::get('verify-email', PromptVerifikasiSurelController::class)
-        ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifikasiSurelController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('email/verification-notification', [NotifikasiVerifikasiSurelController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    Route::get('confirm-password', [KonfirmasiKataSandiController::class, 'show'])
-        ->name('password.confirm');
-
-    Route::post('confirm-password', [KonfirmasiKataSandiController::class, 'store']);
-
+    // Memproses perubahan password akun yang sedang aktif.
+    // Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
     Route::put('password', [KataSandiController::class, 'update'])->name('password.update');
 
+    // Mengakhiri sesi login pengguna.
+    // Mendaftarkan route agar URL dapat diarahkan ke logika yang sesuai.
     Route::post('logout', [SesiMasukController::class, 'destroy'])
+        // Memberikan nama route agar mudah dipanggil dari controller atau view.
         ->name('logout');
+// Menutup struktur atau rangkaian proses pada blok sebelumnya.
 });
