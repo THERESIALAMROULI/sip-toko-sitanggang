@@ -1,9 +1,7 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
 return new class extends Migration
 {
     public function up(): void
@@ -19,7 +17,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (! Schema::hasTable('stok_histories')) {
             Schema::create('stok_histories', function (Blueprint $table) {
                 $table->id();
@@ -35,13 +32,11 @@ return new class extends Migration
             });
         }
     }
-
     public function down(): void
     {
         if (Schema::hasTable('stok_histories')) {
             Schema::drop('stok_histories');
         }
-
         if (Schema::hasTable('suppliers')) {
             Schema::drop('suppliers');
         }

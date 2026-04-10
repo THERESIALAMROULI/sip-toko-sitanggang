@@ -1,128 +1,60 @@
-{{-- Menggunakan layout utama agar struktur halaman tetap konsisten. --}}
 @extends('layouts.admin')
-
-{{-- Mendefinisikan bagian halaman yang akan diisi pada layout. --}}
 @section('title', 'Edit Supplier')
-{{-- Mendefinisikan bagian halaman yang akan diisi pada layout. --}}
 @section('subtitle', 'Perbarui data supplier')
-
-{{-- Mendefinisikan bagian halaman yang akan diisi pada layout. --}}
 @section('content')
-{{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
 <div class="card">
-    {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
     <div class="card-hd">
-        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
         <div class="card-title">Form Edit Supplier</div>
-    {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
     </div>
-    {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
     <div class="card-body">
-        {{-- Membuka form untuk mengirim data dari pengguna ke server. --}}
         <form method="POST" action="{{ route('suppliers.update', $supplier->id) }}" class="stack-md">
-            {{-- Menyisipkan token CSRF untuk melindungi form dari serangan lintas situs. --}}
             @csrf
-            {{-- Menentukan spoofing method HTTP agar form bisa memakai PUT, PATCH, atau DELETE. --}}
             @method('PUT')
-
-            {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
             <div class="form-grid">
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <div class="field">
-                    {{-- Menampilkan label agar pengguna memahami fungsi input yang terkait. --}}
                     <label for="nama">Nama Supplier</label>
-                    {{-- Mendefinisikan field input yang akan diisi oleh pengguna. --}}
                     <input id="nama" type="text" name="nama" value="{{ old('nama', $supplier->nama) }}" required>
-                    {{-- Menampilkan pesan error validasi untuk field terkait. --}}
                     @error('nama')
-                        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                         <div class="field-error">{{ $message }}</div>
-                    {{-- Menutup blok tampilan error validasi. --}}
                     @enderror
-                {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
                 </div>
-
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <div class="field">
-                    {{-- Menampilkan label agar pengguna memahami fungsi input yang terkait. --}}
                     <label for="telp">Telepon</label>
-                    {{-- Mendefinisikan field input yang akan diisi oleh pengguna. --}}
                     <input id="telp" type="text" name="telp" value="{{ old('telp', $supplier->telp) }}">
-                    {{-- Menampilkan pesan error validasi untuk field terkait. --}}
                     @error('telp')
-                        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                         <div class="field-error">{{ $message }}</div>
-                    {{-- Menutup blok tampilan error validasi. --}}
                     @enderror
-                {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
                 </div>
-
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <div class="field field-full">
-                    {{-- Menampilkan label agar pengguna memahami fungsi input yang terkait. --}}
                     <label for="alamat">Alamat</label>
-                    {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                     <textarea id="alamat" name="alamat">{{ old('alamat', $supplier->alamat) }}</textarea>
-                    {{-- Menampilkan pesan error validasi untuk field terkait. --}}
                     @error('alamat')
-                        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                         <div class="field-error">{{ $message }}</div>
-                    {{-- Menutup blok tampilan error validasi. --}}
                     @enderror
-                {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
                 </div>
-
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <div class="field field-full">
-                    {{-- Menampilkan label agar pengguna memahami fungsi input yang terkait. --}}
                     <label for="keterangan">Keterangan</label>
-                    {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                     <textarea id="keterangan" name="keterangan">{{ old('keterangan', $supplier->keterangan) }}</textarea>
-                    {{-- Menampilkan pesan error validasi untuk field terkait. --}}
                     @error('keterangan')
-                        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                         <div class="field-error">{{ $message }}</div>
-                    {{-- Menutup blok tampilan error validasi. --}}
                     @enderror
-                {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
                 </div>
-
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <div class="field field-full">
-                    {{-- Menampilkan label agar pengguna memahami fungsi input yang terkait. --}}
                     <label for="aktif">Status Supplier</label>
-                    {{-- Membuka pilihan dropdown untuk data yang sudah disediakan. --}}
                     <select id="aktif" name="aktif" required>
-                        {{-- Menampilkan salah satu pilihan pada elemen dropdown. --}}
                         <option value="1" @selected((string) old('aktif', $supplier->aktif ? '1' : '0') === '1')>Aktif</option>
-                        {{-- Menampilkan salah satu pilihan pada elemen dropdown. --}}
                         <option value="0" @selected((string) old('aktif', $supplier->aktif ? '1' : '0') === '0')>Nonaktif</option>
-                    {{-- Menutup elemen dropdown setelah seluruh pilihan ditentukan. --}}
                     </select>
-                    {{-- Menampilkan pesan error validasi untuk field terkait. --}}
                     @error('aktif')
-                        {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                         <div class="field-error">{{ $message }}</div>
-                    {{-- Menutup blok tampilan error validasi. --}}
                     @enderror
-                {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
                 </div>
-            {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
             </div>
-
-            {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
             <div class="td-actions">
-                {{-- Mendefinisikan tombol aksi yang bisa digunakan pengguna. --}}
                 <button type="submit" class="btn btn-primary">Update Supplier</button>
-                {{-- Membentuk elemen HTML sebagai bagian dari antarmuka halaman. --}}
                 <a href="{{ route('suppliers.index') }}" class="btn btn-secondary">Kembali</a>
-            {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
             </div>
-        {{-- Menutup form setelah seluruh input selesai didefinisikan. --}}
         </form>
-    {{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
     </div>
-{{-- Menutup elemen HTML yang dibuka sebelumnya. --}}
 </div>
-{{-- Menutup section Blade yang sedang didefinisikan. --}}
 @endsection

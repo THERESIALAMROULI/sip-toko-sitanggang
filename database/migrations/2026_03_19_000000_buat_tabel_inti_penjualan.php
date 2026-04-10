@@ -1,10 +1,8 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
 return new class extends Migration
 {
     public function up(): void
@@ -16,7 +14,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (DB::table('kategoris')->count() === 0) {
             DB::table('kategoris')->insert([
                 'nama' => 'Umum',
@@ -24,7 +21,6 @@ return new class extends Migration
                 'updated_at' => now(),
             ]);
         }
-
         if (! Schema::hasTable('produks')) {
             Schema::create('produks', function (Blueprint $table) {
                 $table->id();
@@ -38,7 +34,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (! Schema::hasTable('pelanggans')) {
             Schema::create('pelanggans', function (Blueprint $table) {
                 $table->id();
@@ -48,7 +43,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (! Schema::hasTable('penjualans')) {
             Schema::create('penjualans', function (Blueprint $table) {
                 $table->id();
@@ -62,7 +56,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (! Schema::hasTable('detail_penjualans')) {
             Schema::create('detail_penjualans', function (Blueprint $table) {
                 $table->id();
@@ -75,7 +68,6 @@ return new class extends Migration
                 $table->timestamps();
             });
         }
-
         if (! Schema::hasTable('piutangs')) {
             Schema::create('piutangs', function (Blueprint $table) {
                 $table->id();
@@ -89,7 +81,6 @@ return new class extends Migration
             });
         }
     }
-
     public function down(): void
     {
         Schema::dropIfExists('piutangs');

@@ -1,18 +1,14 @@
 <?php
-
 namespace App\Http\Requests;
-
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
-
 class SimpanTransaksiRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return true;
     }
-
     public function rules(): array
     {
         return [
@@ -29,7 +25,6 @@ class SimpanTransaksiRequest extends FormRequest
             'products.*.quantity' => ['required', 'integer', 'min:0'],
         ];
     }
-
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
@@ -37,7 +32,6 @@ class SimpanTransaksiRequest extends FormRequest
             $hasPositiveQty = collect($items)->contains(function (array $item) {
                 return (int) ($item['quantity'] ?? 0) > 0;
             });
-
             if (! $hasPositiveQty) {
                 $validator->errors()->add('products', 'Minimal satu item harus memiliki qty lebih dari 0.');
             }

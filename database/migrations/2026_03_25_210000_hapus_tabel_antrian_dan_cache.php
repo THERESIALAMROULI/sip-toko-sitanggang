@@ -1,8 +1,6 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-
 return new class extends Migration
 {
     public function up(): void
@@ -13,9 +11,7 @@ return new class extends Migration
         Schema::dropIfExists('cache');
         Schema::dropIfExists('cache_locks');
     }
-
     public function down(): void
     {
-        // Tabel ini sengaja tidak dikembalikan karena fitur terkait sudah tidak dipakai.
     }
 };
