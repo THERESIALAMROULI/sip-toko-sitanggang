@@ -18,7 +18,7 @@ class PelangganController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:120',
             'phone' => 'required|string|max:25',
-            'address' => 'nullable|string|max:1000',
+            'address' => 'required|string|max:1000',
         ]);
         Pelanggan::create($validated);
         return redirect()->route('customers.index')
@@ -33,7 +33,7 @@ class PelangganController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:120',
             'phone' => 'required|string|max:25',
-            'address' => 'nullable|string|max:1000',
+            'address' => 'required|string|max:1000',
         ]);
         $customer->update($validated);
         return redirect()->route('customers.index')
@@ -41,6 +41,16 @@ class PelangganController extends Controller
     }
     public function destroy(Pelanggan $customer)
     {
+        if ($customer->receivables()->where('status', 'belum')->exists()) {
+            return redirect()->route('customers.index')
+                ->with('error', 'Pelanggan tidak bisa dihapus karena masih memiliki utang yang belum lunas.');
+        }
+
+        if ($customer->receivables()->exists()) {
+            return redirect()->route('customers.index')
+                ->with('error', 'Pelanggan tidak bisa dihapus karena masih memiliki riwayat piutang.');
+        }
+
         $customer->delete();
         return redirect()->route('customers.index')
             ->with('success', 'Pelanggan berhasil dihapus');

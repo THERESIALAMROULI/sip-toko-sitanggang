@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Ubah Status Piutang')
-@section('subtitle', 'Perbarui status pembayaran piutang')
+@section('subtitle', 'Ubah status piutang')
 @section('content')
 <div class="card">
     <div class="card-hd">
@@ -9,7 +9,7 @@
     <div class="card-body">
         <div class="alert alert-info">
             Transaksi: <strong>#{{ $receivable->transaction_id }}</strong> |
-            Customer: <strong>{{ $receivable->transaction->customer->name ?? '-' }}</strong> |
+            Pelanggan: <strong>{{ $receivable->transaction->customer->name ?? '-' }}</strong> |
             Nominal: <strong>Rp {{ number_format($receivable->amount, 0, ',', '.') }}</strong> |
             Jatuh Tempo: <strong>{{ optional($receivable->due_date)->format('d-m-Y') ?? '-' }}</strong>
         </div>

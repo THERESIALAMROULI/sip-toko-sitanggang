@@ -1,15 +1,18 @@
 @extends('layouts.admin')
-@section('title', 'Riwayat Stok')
-@section('subtitle', 'Riwayat penambahan stok produk')
+@section('title', 'Manajemen Stok')
+@section('subtitle', 'Riwayat stok')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Data Stok Histories</div>
+        <div class="card-title">Riwayat Stok</div>
         @if ((Auth::user()->role ?? null) === 'admin')
-            <a href="{{ route('stok_histories.create') }}" class="btn btn-primary">+ Tambah Stok</a>
+            <a href="{{ route('stok_histories.create') }}" class="btn btn-primary">+ Tambah Riwayat Stok</a>
         @endif
     </div>
     <div class="card-body">
+        <div class="alert alert-info">
+            Riwayat stok adalah catatan tetap. Jika ada salah input, buat catatan koreksi baru agar jejak perubahan stok tetap jelas.
+        </div>
         <form method="GET" action="{{ route('stok_histories.index') }}" class="search-row">
             <select name="produk_id" class="filter-sel">
                 <option value="">Semua Produk</option>
@@ -18,7 +21,7 @@
                 @endforeach
             </select>
             <select name="supplier_id" class="filter-sel">
-                <option value="">Semua Supplier</option>
+                <option value="">Semua Pemasok</option>
                 @foreach ($suppliers as $supplier)
                     <option value="{{ $supplier->id }}" @selected((int) ($filters['supplier_id'] ?? 0) === $supplier->id)>{{ $supplier->nama }}</option>
                 @endforeach
@@ -41,8 +44,8 @@
                         <th>No</th>
                         <th>Tanggal</th>
                         <th>Produk</th>
-                        <th>Supplier</th>
-                        <th>Mutasi</th>
+                        <th>Pemasok</th>
+                        <th>Perubahan</th>
                         <th>Stok Sebelum</th>
                         <th>Stok Sesudah</th>
                         <th>Petugas</th>
@@ -57,19 +60,17 @@
                             <td>{{ optional($history->tanggal)->format('d/m/Y H:i') ?? '-' }}</td>
                             <td>{{ $history->produk->nama ?? '-' }}</td>
                             <td>{{ $history->supplier->nama ?? '-' }}</td>
-                            <td class="mono">{{ $history->jumlah > 0 ? '+' : '' }}{{ number_format($history->jumlah, 0, ',', '.') }}</td>
+                            <td>
+                                <div class="mono">{{ $history->jumlah > 0 ? '+' : '' }}{{ number_format($history->jumlah, 0, ',', '.') }}</div>
+                                <div class="table-sub">{{ $history->jumlah > 0 ? 'Stok bertambah' : 'Stok berkurang' }}</div>
+                            </td>
                             <td>{{ $history->stok_sebelum }}</td>
                             <td>{{ $history->stok_sesudah }}</td>
                             <td>{{ $history->user->name ?? '-' }}</td>
                             <td>{{ $history->keterangan ?: '-' }}</td>
                             <td>
                                 <div class="td-actions">
-                                    <a href="{{ route('stok_histories.edit', $history->id) }}" class="btn btn-secondary btn-sm">Edit</a>
-                                    <form action="{{ route('stok_histories.destroy', $history->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus mutasi stok ini?')">Hapus</button>
-                                    </form>
+                                    <a href="{{ route('stok_histories.correction', $history->id) }}" class="btn btn-secondary btn-sm">Buat Koreksi</a>
                                 </div>
                             </td>
                         </tr>

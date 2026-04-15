@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Detail Transaksi')
-@section('subtitle', 'Rincian transaksi dan item penjualan')
+@section('subtitle', 'Detail transaksi')
 @section('content')
 @php
     $isKasir = (auth()->user()->role ?? null) === 'kasir';

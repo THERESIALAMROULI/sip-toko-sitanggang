@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Transaksi')
-@section('subtitle', 'Riwayat transaksi penjualan')
+@section('subtitle', 'Data transaksi')
 @section('content')
 @php
     $isKasir = (auth()->user()->role ?? null) === 'kasir';
@@ -42,7 +42,7 @@
     </div>
     <div class="card">
         <div class="card-hd">
-            <div class="card-title">Data Transaksi</div>
+            <div class="card-title">Daftar Transaksi</div>
             <span class="badge badge-blue">{{ $transactions->count() }} transaksi</span>
         </div>
         <div class="card-body">

@@ -23,14 +23,14 @@
                 <div class="sb-logo-icon">S</div>
                 <div>
                     <div class="sb-logo-text">SIPA Sitanggang</div>
-                    <div class="sb-logo-sub">Sistem Penjualan</div>
+                    <div class="sb-logo-sub">Penjualan dan stok</div>
                 </div>
             </div>
             <div class="sb-user">
                 <div class="sb-avatar {{ $role }}">{{ $initial }}</div>
                 <div class="sb-user-info">
                     <div class="name">{{ $user->name }}</div>
-                    <div class="role">{{ strtoupper($role) }}</div>
+                    <div class="role">{{ ucfirst($role) }}</div>
                 </div>
             </div>
         </div>
@@ -43,15 +43,15 @@
             @if ($role === 'admin')
                 <a href="{{ route('users.index') }}" class="sb-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">U</span>
-                    <span>Manajemen User</span>
+                    <span>Pengguna</span>
                 </a>
                 <a href="{{ route('kategoris.index') }}" class="sb-item {{ request()->routeIs('kategoris.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">K</span>
-                    <span>Kategori</span>
+                    <span>Kategori Produk</span>
                 </a>
                 <a href="{{ route('suppliers.index') }}" class="sb-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">S</span>
-                    <span>Supplier</span>
+                    <span>Pemasok</span>
                 </a>
                 <a href="{{ route('products.index') }}" class="sb-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">P</span>
@@ -67,7 +67,7 @@
                 </a>
                 <a href="{{ route('expenses.index') }}" class="sb-item {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
                     <span class="sb-item-icon">O</span>
-                    <span>Biaya Operasional</span>
+                    <span>Pengeluaran</span>
                 </a>
             @endif
             @if ($role === 'kasir')
@@ -91,17 +91,19 @@
                 </a>
             @endif
             @if (in_array($role, ['admin', 'owner'], true))
+                <a href="{{ route('reports.stock') }}" class="sb-item {{ request()->routeIs('reports.stock') ? 'active' : '' }}">
+                    <span class="sb-item-icon">S</span>
+                    <span>Laporan Stok</span>
+                </a>
+            @endif
+            @if ($role === 'owner')
                 <a href="{{ route('reports.sales') }}" class="sb-item {{ request()->routeIs('reports.sales') ? 'active' : '' }}">
                     <span class="sb-item-icon">L</span>
                     <span>Laporan Penjualan</span>
                 </a>
                 <a href="{{ route('reports.receivables') }}" class="sb-item {{ request()->routeIs('reports.receivables') ? 'active' : '' }}">
                     <span class="sb-item-icon">U</span>
-                    <span>Laporan Utang</span>
-                </a>
-                <a href="{{ route('reports.stock') }}" class="sb-item {{ request()->routeIs('reports.stock') ? 'active' : '' }}">
-                    <span class="sb-item-icon">S</span>
-                    <span>Laporan Stok</span>
+                    <span>Laporan Piutang</span>
                 </a>
                 <a href="{{ route('reports.expenses') }}" class="sb-item {{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
                     <span class="sb-item-icon">B</span>
@@ -119,7 +121,7 @@
                 @csrf
                 <button type="submit" class="sb-logout">
                     <span class="sb-item-icon">X</span>
-                    <span>Logout</span>
+                    <span>Keluar</span>
                 </button>
             </form>
         </div>
@@ -127,15 +129,15 @@
     <div class="page-content">
         <header class="topbar">
             <div class="topbar-left">
-                <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Toggle menu">=</button>
+                <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Buka menu">=</button>
                 <div>
                     <div class="page-title">@yield('title', 'Dashboard')</div>
-                    <div class="page-sub">@yield('subtitle', 'Sistem Informasi Penjualan Toko Sitanggang')</div>
+                    <div class="page-sub">@yield('subtitle', 'Kelola data toko')</div>
                 </div>
             </div>
             <div class="topbar-right">
                 <span class="badge badge-gray">{{ now()->format('d M Y') }}</span>
-                <span class="badge badge-blue">{{ strtoupper($role) }}</span>
+                <span class="badge badge-blue">{{ ucfirst($role) }}</span>
             </div>
         </header>
         <main class="content-area">

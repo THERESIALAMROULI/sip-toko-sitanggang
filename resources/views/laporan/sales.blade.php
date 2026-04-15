@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Laporan Penjualan')
-@section('subtitle', 'Analisis data penjualan berdasarkan filter')
+@section('subtitle', 'Laporan penjualan')
 @section('content')
 <div class="stack-lg">
     <div class="card">
@@ -130,7 +130,7 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Customer</th>
+                            <th>Pelanggan</th>
                             <th>Pembayaran</th>
                             <th>Total</th>
                         </tr>

@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Tambah Kategori Biaya')
-@section('subtitle', 'Masukkan kategori biaya operasional baru')
+@section('subtitle', 'Tambah kategori pengeluaran')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Kategori Biaya</div>
+        <div class="card-title">Data Kategori Pengeluaran</div>
     </div>
     <div class="card-body">
         <form action="{{ route('expense_categories.store') }}" method="POST" class="stack-md">

@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Edit Biaya Operasional')
-@section('subtitle', 'Perbarui data biaya operasional')
+@section('subtitle', 'Edit pengeluaran')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Edit Biaya</div>
+        <div class="card-title">Edit Pengeluaran</div>
     </div>
     <div class="card-body">
         <form action="{{ route('expenses.update', $expense->id) }}" method="POST" class="stack-md">

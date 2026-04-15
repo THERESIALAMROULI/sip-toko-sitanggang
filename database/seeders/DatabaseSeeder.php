@@ -10,9 +10,9 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
     public function run(): void
     {
-        $this->seedUser('theresia0424@gmail.com', 'Admin User', 'admin', 'admin456@!!!', 'admin');
-        $this->seedUser('kasir@example.com', 'Bony', 'kasir', 'kasir789@!!!');
-        $this->seedUser('owner@example.com', 'Owner User', 'owner', 'owner123@!!!');
+        $this->seedUser('admin', 'Admin User', 'admin', 'admin456@!!!');
+        $this->seedUser('kasir', 'Kasir User', 'kasir', 'kasir789@!!!');
+        $this->seedUser('owner', 'Owner User', 'owner', 'owner123@!!!');
         $kategoris = [
             'Sembako',
             'Minuman',
@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
             'Rokok',
             'Sabun & Detergen',
             'Obat-obatan',
+            'Bumbu Dapur',
+            'Produk Susu',
+            'Perawatan Bayi',
         ];
         foreach ($kategoris as $kategoriNama) {
             DB::table('kategoris')->updateOrInsert(
@@ -41,6 +44,28 @@ class DatabaseSeeder extends Seeder
             ['nama' => 'Teh Celup', 'kategori' => 'Minuman', 'harga_jual' => 9000, 'stok' => 30],
             ['nama' => 'Kopi Sachet', 'kategori' => 'Minuman', 'harga_jual' => 2500, 'stok' => 65],
             ['nama' => 'Air Mineral 600ml', 'kategori' => 'Minuman', 'harga_jual' => 4000, 'stok' => 90],
+            ['nama' => 'Biskuit Cokelat', 'kategori' => 'Snack', 'harga_jual' => 8500, 'stok' => 40],
+            ['nama' => 'Keripik Singkong', 'kategori' => 'Snack', 'harga_jual' => 7000, 'stok' => 35],
+            ['nama' => 'Wafer Vanila', 'kategori' => 'Snack', 'harga_jual' => 9500, 'stok' => 28],
+            ['nama' => 'Rokok Filter', 'kategori' => 'Rokok', 'harga_jual' => 28000, 'stok' => 18],
+            ['nama' => 'Rokok Kretek', 'kategori' => 'Rokok', 'harga_jual' => 24000, 'stok' => 22],
+            ['nama' => 'Sabun Mandi Batang', 'kategori' => 'Sabun & Detergen', 'harga_jual' => 4500, 'stok' => 50],
+            ['nama' => 'Detergen Bubuk 800gr', 'kategori' => 'Sabun & Detergen', 'harga_jual' => 18000, 'stok' => 19],
+            ['nama' => 'Pembersih Lantai', 'kategori' => 'Sabun & Detergen', 'harga_jual' => 16000, 'stok' => 16],
+            ['nama' => 'Paracetamol', 'kategori' => 'Obat-obatan', 'harga_jual' => 12000, 'stok' => 24],
+            ['nama' => 'Vitamin C', 'kategori' => 'Obat-obatan', 'harga_jual' => 15000, 'stok' => 26],
+            ['nama' => 'Minyak Kayu Putih', 'kategori' => 'Obat-obatan', 'harga_jual' => 23000, 'stok' => 12],
+            ['nama' => 'Garam Halus', 'kategori' => 'Bumbu Dapur', 'harga_jual' => 5000, 'stok' => 33],
+            ['nama' => 'Kecap Manis', 'kategori' => 'Bumbu Dapur', 'harga_jual' => 12000, 'stok' => 21],
+            ['nama' => 'Saus Sambal', 'kategori' => 'Bumbu Dapur', 'harga_jual' => 11000, 'stok' => 18],
+            ['nama' => 'Susu Bubuk Anak', 'kategori' => 'Produk Susu', 'harga_jual' => 42000, 'stok' => 14],
+            ['nama' => 'Yogurt Botol', 'kategori' => 'Produk Susu', 'harga_jual' => 9000, 'stok' => 20],
+            ['nama' => 'Keju Slice', 'kategori' => 'Produk Susu', 'harga_jual' => 18000, 'stok' => 17],
+            ['nama' => 'Popok Bayi', 'kategori' => 'Perawatan Bayi', 'harga_jual' => 52000, 'stok' => 13],
+            ['nama' => 'Tisu Basah Bayi', 'kategori' => 'Perawatan Bayi', 'harga_jual' => 17000, 'stok' => 27],
+            ['nama' => 'Bedak Bayi', 'kategori' => 'Perawatan Bayi', 'harga_jual' => 14000, 'stok' => 15],
+            ['nama' => 'Sapu Lantai', 'kategori' => 'Umum', 'harga_jual' => 28000, 'stok' => 11],
+            ['nama' => 'Pel Serbaguna', 'kategori' => 'Umum', 'harga_jual' => 35000, 'stok' => 12],
         ];
         foreach ($products as $product) {
             $kategoriId = (int) ($kategoriMap[$product['kategori']] ?? 1);
@@ -62,6 +87,8 @@ class DatabaseSeeder extends Seeder
             ['nama' => 'PT Indofood Sukses', 'telp' => '021-7981590', 'alamat' => 'Jakarta Selatan', 'keterangan' => 'Mie instan, bumbu', 'aktif' => 1],
             ['nama' => 'CV Maju Jaya', 'telp' => '0274-445566', 'alamat' => 'Yogyakarta', 'keterangan' => 'Rokok, minuman', 'aktif' => 1],
             ['nama' => 'UD Sumber Rejeki', 'telp' => '0274-889900', 'alamat' => 'Sleman', 'keterangan' => 'Sembako, minyak goreng', 'aktif' => 1],
+            ['nama' => 'PT Sentosa Niaga', 'telp' => '022-667788', 'alamat' => 'Bandung', 'keterangan' => 'Produk susu dan snack', 'aktif' => 1],
+            ['nama' => 'CV Prima Grosir', 'telp' => '031-445577', 'alamat' => 'Surabaya', 'keterangan' => 'Perawatan bayi dan alat rumah tangga', 'aktif' => 1],
         ];
         foreach ($suppliers as $supplier) {
             DB::table('suppliers')->updateOrInsert(
@@ -99,6 +126,8 @@ class DatabaseSeeder extends Seeder
                 ['nama' => 'Transportasi', 'deskripsi' => 'Biaya bensin, parkir, dan pengiriman', 'aktif' => 1],
                 ['nama' => 'Utilitas', 'deskripsi' => 'Listrik, air, internet, dan telepon', 'aktif' => 1],
                 ['nama' => 'Perlengkapan Toko', 'deskripsi' => 'ATK, kantong plastik, alat kebersihan', 'aktif' => 1],
+                ['nama' => 'Perawatan Peralatan', 'deskripsi' => 'Servis freezer, timbangan, dan etalase', 'aktif' => 1],
+                ['nama' => 'Keamanan', 'deskripsi' => 'CCTV, gembok, dan kebutuhan keamanan toko', 'aktif' => 1],
             ];
             foreach ($expenseCategories as $expenseCategory) {
                 DB::table('expense_categories')->updateOrInsert(
@@ -113,7 +142,7 @@ class DatabaseSeeder extends Seeder
             }
         }
         if (Schema::hasTable('expenses') && Schema::hasTable('expense_categories')) {
-            $adminId = (int) (DB::table('users')->where('email', 'theresia0424@gmail.com')->value('id') ?? 0);
+            $adminId = (int) (DB::table('users')->where('username', 'admin')->value('id') ?? 0);
             $utilitasId = (int) (DB::table('expense_categories')->where('nama', 'Utilitas')->value('id') ?? 0);
             $perlengkapanId = (int) (DB::table('expense_categories')->where('nama', 'Perlengkapan Toko')->value('id') ?? 0);
             if ($adminId > 0 && $utilitasId > 0) {
@@ -147,13 +176,12 @@ class DatabaseSeeder extends Seeder
                 );
             }
         }
+        $this->seedSampleStockHistories();
         $this->seedSampleTransactions();
     }
-    private function seedUser(string $email, string $name, string $role, string $plainPassword, ?string $usernameOverride = null): void
+    private function seedUser(string $username, string $name, string $role, string $plainPassword): void
     {
-        $username = $usernameOverride ?: (strstr($email, '@', true) ?: $email);
         $payload = [
-            'email' => $email,
             'name' => $name,
             'role' => $role,
             'password' => Hash::make($plainPassword),
@@ -168,23 +196,28 @@ class DatabaseSeeder extends Seeder
         if (Schema::hasColumn('users', 'status')) {
             $payload['status'] = 'aktif';
         }
+        $existingByUsername = null;
         if (Schema::hasColumn('users', 'username')) {
             $existingByUsername = DB::table('users')
                 ->where('username', $username)
                 ->first();
-            if ($existingByUsername) {
-                DB::table('users')
-                    ->where('id', $existingByUsername->id)
-                    ->update($payload);
-                return;
+
+            if (! $existingByUsername && $username === 'kasir') {
+                $existingByUsername = DB::table('users')
+                    ->where('username', 'bony')
+                    ->first();
             }
         }
-        $existing = DB::table('users')->where('email', $email)->exists();
-        if (! $existing) {
-            $payload['created_at'] = now();
+
+        if ($existingByUsername) {
+            DB::table('users')
+                ->where('id', $existingByUsername->id)
+                ->update($payload);
+            return;
         }
+        $payload['created_at'] = now();
         DB::table('users')->updateOrInsert(
-            ['email' => $email],
+            ['username' => $username],
             $payload
         );
     }
@@ -195,7 +228,7 @@ class DatabaseSeeder extends Seeder
             || ! Schema::hasTable('piutangs')) {
             return;
         }
-        $kasirId = (int) (DB::table('users')->where('email', 'kasir@example.com')->value('id') ?? 0);
+        $kasirId = (int) (DB::table('users')->where('username', 'kasir')->value('id') ?? 0);
         $customers = DB::table('pelanggans')->orderBy('id')->pluck('id')->values();
         $products = DB::table('produks')
             ->where('aktif', 1)
@@ -273,6 +306,112 @@ class DatabaseSeeder extends Seeder
             ],
             null
         );
+    }
+
+    private function seedSampleStockHistories(): void
+    {
+        if (! Schema::hasTable('stok_histories')
+            || ! Schema::hasTable('suppliers')
+            || ! Schema::hasTable('produks')) {
+            return;
+        }
+
+        $adminId = (int) (DB::table('users')->where('username', 'admin')->value('id') ?? 0);
+        if ($adminId <= 0) {
+            return;
+        }
+
+        $supplierMap = DB::table('suppliers')->pluck('id', 'nama');
+        $productMap = DB::table('produks')->pluck('id', 'nama');
+        $entries = [
+            [
+                'produk' => 'Beras 5kg',
+                'supplier' => 'UD Sumber Rejeki',
+                'jumlah' => 10,
+                'tanggal' => now()->subDays(14)->setTime(8, 30),
+                'keterangan' => 'Restok mingguan beras',
+            ],
+            [
+                'produk' => 'Susu UHT 1L',
+                'supplier' => 'PT Sentosa Niaga',
+                'jumlah' => 8,
+                'tanggal' => now()->subDays(10)->setTime(9, 15),
+                'keterangan' => 'Barang datang dari pemasok susu',
+            ],
+            [
+                'produk' => 'Popok Bayi',
+                'supplier' => 'CV Prima Grosir',
+                'jumlah' => 6,
+                'tanggal' => now()->subDays(7)->setTime(10, 0),
+                'keterangan' => 'Tambahan stok popok bayi',
+            ],
+            [
+                'produk' => 'Detergen Bubuk 800gr',
+                'supplier' => 'CV Prima Grosir',
+                'jumlah' => -3,
+                'tanggal' => now()->subDays(4)->setTime(15, 20),
+                'keterangan' => 'Koreksi stok setelah audit rak',
+            ],
+            [
+                'produk' => 'Kopi Sachet',
+                'supplier' => 'CV Maju Jaya',
+                'jumlah' => 12,
+                'tanggal' => now()->subDays(2)->setTime(11, 45),
+                'keterangan' => 'Penambahan stok kopi sachet',
+            ],
+        ];
+
+        foreach ($entries as $entry) {
+            $productId = (int) ($productMap[$entry['produk']] ?? 0);
+            $supplierId = (int) ($supplierMap[$entry['supplier']] ?? 0);
+
+            if ($productId <= 0) {
+                continue;
+            }
+
+            $existing = DB::table('stok_histories')
+                ->where('produk_id', $productId)
+                ->where('tanggal', $entry['tanggal'])
+                ->where('keterangan', $entry['keterangan'])
+                ->first();
+
+            if ($existing) {
+                continue;
+            }
+
+            $product = DB::table('produks')
+                ->where('id', $productId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $product) {
+                continue;
+            }
+
+            $stokSebelum = (int) $product->stok;
+            $stokSesudah = max($stokSebelum + (int) $entry['jumlah'], 0);
+            $appliedQty = $stokSesudah - $stokSebelum;
+
+            DB::table('produks')
+                ->where('id', $productId)
+                ->update([
+                    'stok' => $stokSesudah,
+                    'updated_at' => now(),
+                ]);
+
+            DB::table('stok_histories')->insert([
+                'produk_id' => $productId,
+                'supplier_id' => $supplierId > 0 ? $supplierId : null,
+                'user_id' => $adminId,
+                'jumlah' => $appliedQty,
+                'stok_sebelum' => $stokSebelum,
+                'stok_sesudah' => $stokSesudah,
+                'keterangan' => $entry['keterangan'],
+                'tanggal' => $entry['tanggal'],
+                'created_at' => $entry['tanggal'],
+                'updated_at' => now(),
+            ]);
+        }
     }
     private function createSampleTransaction(
         string $noNota,

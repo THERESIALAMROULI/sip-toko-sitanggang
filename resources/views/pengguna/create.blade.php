@@ -1,10 +1,10 @@
 @extends('layouts.admin')
-@section('title', 'Tambah User')
-@section('subtitle', 'Buat akun user baru')
+@section('title', 'Tambah Pengguna')
+@section('subtitle', 'Tambah pengguna')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form User</div>
+        <div class="card-title">Data Pengguna</div>
     </div>
     <div class="card-body">
         <form method="POST" action="{{ route('users.store') }}" class="stack-md">
@@ -17,24 +17,18 @@
                         <div class="field-error">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="field">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required>
-                    @error('email')
-                        <div class="field-error">{{ $message }}</div>
-                    @enderror
-                </div>
                 @if ($hasUsernameColumn)
                     <div class="field">
                         <label for="username">Username</label>
-                        <input id="username" type="text" name="username" value="{{ old('username') }}">
+                        <input id="username" type="text" name="username" value="{{ old('username') }}" required>
+                        <div class="form-hint">Dipakai saat masuk.</div>
                         @error('username')
                             <div class="field-error">{{ $message }}</div>
                         @enderror
                     </div>
                 @endif
                 <div class="field">
-                    <label for="role">Role</label>
+                    <label for="role">Peran</label>
                     <select id="role" name="role" required>
                         <option value="owner" @selected(old('role') === 'owner')>Owner</option>
                         <option value="admin" @selected(old('role') === 'admin')>Admin</option>
@@ -69,7 +63,7 @@
                 </div>
             </div>
             <div class="td-actions">
-                <button type="submit" class="btn btn-primary">Simpan User</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
                 <a href="{{ route('users.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
         </form>

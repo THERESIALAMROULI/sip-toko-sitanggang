@@ -19,8 +19,7 @@ class ManajemenPenggunaController extends Controller
         if (! empty($validated['q'])) {
             $search = trim($validated['q']);
             $usersQuery->where(function ($query) use ($search, $hasUsernameColumn) {
-                $query->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('email', 'like', '%'.$search.'%');
+                $query->where('name', 'like', '%'.$search.'%');
                 if ($hasUsernameColumn) {
                     $query->orWhere('username', 'like', '%'.$search.'%');
                 }
@@ -53,12 +52,11 @@ class ManajemenPenggunaController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'role' => ['required', 'in:owner,admin,kasir'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
         if (Schema::hasColumn('users', 'username')) {
-            $rules['username'] = ['nullable', 'string', 'max:50', 'unique:users,username'];
+            $rules['username'] = ['required', 'string', 'max:50', 'unique:users,username'];
         }
         if (Schema::hasColumn('users', 'status')) {
             $rules['status'] = ['required', 'in:aktif,nonaktif'];
@@ -66,7 +64,6 @@ class ManajemenPenggunaController extends Controller
         $validated = $request->validate($rules);
         $payload = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
             'role' => $validated['role'],
             'password' => $validated['password'],
         ];
@@ -74,7 +71,7 @@ class ManajemenPenggunaController extends Controller
             $payload['nama'] = $validated['name'];
         }
         if (Schema::hasColumn('users', 'username')) {
-            $payload['username'] = $validated['username'] ?? (strstr($validated['email'], '@', true) ?: $validated['email']);
+            $payload['username'] = $validated['username'];
         }
         if (Schema::hasColumn('users', 'status')) {
             $payload['status'] = $validated['status'];
@@ -93,12 +90,11 @@ class ManajemenPenggunaController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'role' => ['required', 'in:owner,admin,kasir'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ];
         if (Schema::hasColumn('users', 'username')) {
-            $rules['username'] = ['nullable', 'string', 'max:50', Rule::unique('users', 'username')->ignore($user->id)];
+            $rules['username'] = ['required', 'string', 'max:50', Rule::unique('users', 'username')->ignore($user->id)];
         }
         if (Schema::hasColumn('users', 'status')) {
             $rules['status'] = ['required', 'in:aktif,nonaktif'];
@@ -106,7 +102,6 @@ class ManajemenPenggunaController extends Controller
         $validated = $request->validate($rules);
         $payload = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
             'role' => $validated['role'],
         ];
         if (! empty($validated['password'])) {
@@ -116,7 +111,7 @@ class ManajemenPenggunaController extends Controller
             $payload['nama'] = $validated['name'];
         }
         if (Schema::hasColumn('users', 'username')) {
-            $payload['username'] = $validated['username'] ?? (strstr($validated['email'], '@', true) ?: $validated['email']);
+            $payload['username'] = $validated['username'];
         }
         if (Schema::hasColumn('users', 'status')) {
             $payload['status'] = $validated['status'];

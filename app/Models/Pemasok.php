@@ -11,7 +11,6 @@ class Pemasok extends Model
         'nama',
         'telp',
         'alamat',
-        'keterangan',
         'aktif',
     ];
     protected $casts = [

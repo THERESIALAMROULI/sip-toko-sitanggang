@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Cek Stok Produk')
-@section('subtitle', 'Pantau status ketersediaan produk')
+@section('subtitle', 'Cek stok')
 @section('content')
 <div class="stack-lg">
     <div class="card">

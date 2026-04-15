@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Profil')
-@section('subtitle', 'Kelola informasi akun Anda')
+@section('subtitle', 'Akun Anda')
 @section('content')
 <div class="stack-lg">
     <div class="card">
@@ -27,7 +27,7 @@
                         @enderror
                     </div>
                     <div class="field">
-                        <label for="role">Role</label>
+                        <label for="role">Peran</label>
                         <input id="role" type="text" value="{{ ucfirst($user->role ?? '-') }}" disabled>
                     </div>
                 </div>
@@ -51,21 +51,21 @@
                 <div class="form-grid">
                     <div class="field">
                         <label for="current_password">Password Saat Ini</label>
-                        <input id="current_password" type="password" name="current_password" autocomplete="current-password">
+                        <input id="current_password" type="password" name="current_password" autocomplete="current-password" required>
                         @if ($errors->updatePassword->get('current_password'))
                             <div class="field-error">{{ $errors->updatePassword->first('current_password') }}</div>
                         @endif
                     </div>
                     <div class="field">
                         <label for="password">Password Baru</label>
-                        <input id="password" type="password" name="password" autocomplete="new-password">
+                        <input id="password" type="password" name="password" autocomplete="new-password" required>
                         @if ($errors->updatePassword->get('password'))
                             <div class="field-error">{{ $errors->updatePassword->first('password') }}</div>
                         @endif
                     </div>
                     <div class="field field-full">
                         <label for="password_confirmation">Konfirmasi Password Baru</label>
-                        <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password">
+                        <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password" required>
                         @if ($errors->updatePassword->get('password_confirmation'))
                             <div class="field-error">{{ $errors->updatePassword->first('password_confirmation') }}</div>
                         @endif

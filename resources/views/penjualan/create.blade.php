@@ -1,26 +1,29 @@
 @extends('layouts.admin')
 @section('title', 'Tambah Transaksi')
-@section('subtitle', 'Input transaksi penjualan baru')
+@section('subtitle', 'Tambah transaksi')
 @section('content')
 <form action="{{ route('transactions.store') }}" method="POST" class="stack-lg">
     @csrf
     <div class="card">
         <div class="card-hd">
-            <div class="card-title">Informasi Transaksi</div>
+            <div class="card-title">Data Transaksi</div>
         </div>
         <div class="card-body">
             <div class="form-grid">
                 <div class="field">
-                    <label for="customer_id">Customer</label>
+                    <label for="customer_id">Pelanggan</label>
                     <select id="customer_id" name="customer_id">
-                        <option value="">Umum / Tanpa Customer</option>
+                        <option value="">Umum / Tanpa pelanggan</option>
                         @foreach ($customers as $customer)
                             <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>
                                 {{ $customer->name }}
                             </option>
                         @endforeach
                     </select>
-                    <div class="form-hint">Wajib dipilih jika metode pembayaran utang.</div>
+                    <div class="form-hint">Wajib untuk pembayaran utang.</div>
+                    @error('customer_id')
+                        <div class="field-error">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="field">
                     <label for="payment_type">Metode Pembayaran</label>
@@ -29,6 +32,9 @@
                         <option value="tunai" @selected(old('payment_type') === 'tunai')>Tunai</option>
                         <option value="utang" @selected(old('payment_type') === 'utang')>Utang (Piutang)</option>
                     </select>
+                    @error('payment_type')
+                        <div class="field-error">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="field js-cash-field" id="cash-field">
                     <label for="cash_received">Uang Diterima</label>
@@ -68,7 +74,7 @@
                         <tr>
                             <th>No</th>
                             <th>Produk</th>
-                            <th>Harga</th>
+                            <th>Harga Jual</th>
                             <th>Stok</th>
                             <th>Qty</th>
                             <th>Subtotal</th>
@@ -114,7 +120,7 @@
                 </div>
                 <div class="mt-3">
                     <span class="badge badge-blue">
-                        Estimasi total:
+                        Total sementara:
                         <strong id="estimated-total" class="mono">Rp 0</strong>
                     </span>
                 </div>
@@ -122,7 +128,7 @@
         </div>
     </div>
     <div class="td-actions">
-        <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
         <a href="{{ route('transactions.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 </form>
@@ -137,6 +143,7 @@
         const cashField = document.getElementById('cash-field');
         const changeField = document.getElementById('change-field');
         const dueDateField = document.getElementById('due-date-field');
+        const customerInput = document.getElementById('customer_id');
         const cashInput = document.getElementById('cash_received');
         const dueDateInput = document.getElementById('due_date');
         const changePreview = document.getElementById('change_preview');
@@ -156,6 +163,9 @@
             }
             if (dueDateField) {
                 dueDateField.style.display = isUtang ? '' : 'none';
+            }
+            if (customerInput) {
+                customerInput.required = isUtang;
             }
             if (cashInput) {
                 cashInput.required = isTunai;

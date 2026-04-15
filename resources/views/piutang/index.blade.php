@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Piutang')
-@section('subtitle', 'Daftar piutang dari transaksi kredit')
+@section('subtitle', 'Data piutang')
 @section('content')
 @php
     $isKasir = (auth()->user()->role ?? null) === 'kasir';
@@ -53,17 +53,17 @@
         <div class="stat-card sc-amber">
             <div class="sc-label">Total Belum Lunas</div>
             <div class="sc-value mono">Rp {{ number_format($summaryUnpaidAmount, 0, ',', '.') }}</div>
-            <div class="sc-sub">Dari hasil filter aktif</div>
+            <div class="sc-sub">Sesuai filter</div>
         </div>
         <div class="stat-card sc-red">
             <div class="sc-label">Lewat Jatuh Tempo</div>
             <div class="sc-value mono">Rp {{ number_format($summaryOverdueAmount, 0, ',', '.') }}</div>
-            <div class="sc-sub">Belum lunas dan melewati tanggal jatuh tempo</div>
+            <div class="sc-sub">Belum lunas dan lewat tempo</div>
         </div>
         <div class="stat-card sc-blue">
             <div class="sc-label">Piutang Lunas</div>
             <div class="sc-value">{{ number_format($summaryPaidCount, 0, ',', '.') }}</div>
-            <div class="sc-sub">Jumlah dokumen piutang berstatus lunas</div>
+            <div class="sc-sub">Jumlah piutang lunas</div>
         </div>
     </div>
     <div class="card">
@@ -73,7 +73,7 @@
         </div>
         <div class="card-body">
             <p class="form-hint mb-3">
-                Piutang terbentuk otomatis dari transaksi dengan metode pembayaran kredit.
+                Piutang dibuat otomatis dari transaksi utang.
             </p>
             @if ($receivables->isEmpty())
                 <div class="empty-state">
@@ -87,7 +87,7 @@
                         <tr>
                             <th>No</th>
                             <th>Transaksi</th>
-                            <th>Customer</th>
+                            <th>Pelanggan</th>
                             <th>Jumlah</th>
                             <th>Status</th>
                             <th>Jatuh Tempo</th>

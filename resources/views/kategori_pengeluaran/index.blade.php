@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Kategori Biaya')
-@section('subtitle', 'Kelola kategori untuk pencatatan biaya operasional')
+@section('subtitle', 'Data kategori pengeluaran')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Daftar Kategori Biaya</div>
+        <div class="card-title">Daftar Kategori Pengeluaran</div>
         <a href="{{ route('expense_categories.create') }}" class="btn btn-primary">+ Tambah Kategori</a>
     </div>
     <div class="card-body">

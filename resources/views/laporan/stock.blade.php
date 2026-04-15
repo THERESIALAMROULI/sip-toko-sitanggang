@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Laporan Stok')
-@section('subtitle', 'Ringkasan persediaan dan mutasi stok')
+@section('subtitle', 'Laporan stok')
 @section('content')
 <div class="stack-lg">
     <div class="card">
@@ -104,18 +104,46 @@
                             </tbody>
                         </table>
                     </div>
+                    @if ($products->hasPages())
+                        <div class="pagination-bar">
+                            <div class="table-sub">
+                                Menampilkan {{ $products->firstItem() }}-{{ $products->lastItem() }} dari {{ $products->total() }} produk
+                            </div>
+                            <div class="pagination-pages">
+                                @if ($products->onFirstPage())
+                                    <span class="btn btn-secondary btn-sm" aria-disabled="true">Sebelumnya</span>
+                                @else
+                                    <a href="{{ $products->previousPageUrl() }}" class="btn btn-secondary btn-sm">Sebelumnya</a>
+                                @endif
+
+                                @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                                    @if ($page === $products->currentPage())
+                                        <span class="btn btn-primary btn-sm" aria-current="page">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="btn btn-secondary btn-sm">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($products->hasMorePages())
+                                    <a href="{{ $products->nextPageUrl() }}" class="btn btn-secondary btn-sm">Berikutnya</a>
+                                @else
+                                    <span class="btn btn-secondary btn-sm" aria-disabled="true">Berikutnya</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 @endif
             </div>
         </div>
         <div class="card">
             <div class="card-hd">
-                <div class="card-title">Mutasi Stok Terbaru</div>
+                <div class="card-title">Riwayat Perubahan Stok Terbaru</div>
             </div>
             <div class="card-body">
                 @if ($recentMutations->isEmpty())
                     <div class="empty-state">
                         <div class="es-icon">-</div>
-                        <p>Belum ada mutasi stok.</p>
+                        <p>Belum ada riwayat perubahan stok.</p>
                     </div>
                 @else
                     <div class="tbl-wrap">
@@ -152,7 +180,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
     const stockExportData = {
-        products: {!! json_encode($products->map(function ($product) {
+        products: {!! json_encode($exportProducts->map(function ($product) {
             $status = 'Normal';
             if (! $product->aktif) {
                 $status = 'Nonaktif';
@@ -169,6 +197,14 @@
                 'status' => $status,
             ];
         })->values()) !!},
+        recentMutations: {!! json_encode($recentMutations->map(function ($mutation) {
+            return [
+                'date' => optional($mutation->tanggal)->format('d-m-Y H:i') ?? '-',
+                'product' => $mutation->produk->nama ?? '-',
+                'quantity' => (int) $mutation->jumlah,
+                'operator' => $mutation->user->name ?? '-',
+            ];
+        })->values()) !!},
         summary: {
             totalProducts: {{ (int) $totalProducts }},
             lowStockCount: {{ (int) $lowStockCount }},
@@ -177,6 +213,15 @@
         }
     };
     const formatRupiahStock = (value) => `Rp ${new Intl.NumberFormat('id-ID').format(Number(value || 0))}`;
+    const formatSignedStockChange = (value) => {
+        const amount = Number(value || 0);
+
+        if (amount > 0) {
+            return `+${amount}`;
+        }
+
+        return `${amount}`;
+    };
     const createExcelSheet = (title, headers, rows, summaryRows = []) => {
         const aoa = [[title], []];
         summaryRows.forEach((row) => aoa.push(row));
@@ -228,6 +273,22 @@
             );
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Laporan Stok');
+            const mutationRows = stockExportData.recentMutations.map((item, index) => [
+                index + 1,
+                item.date,
+                item.product,
+                formatSignedStockChange(item.quantity),
+                item.operator
+            ]);
+            const mutationWorksheet = createExcelSheet(
+                'Riwayat Perubahan Stok Terbaru',
+                ['No', 'Tanggal', 'Produk', 'Perubahan Stok', 'Petugas'],
+                mutationRows,
+                [
+                    ['Jumlah Riwayat', stockExportData.recentMutations.length]
+                ]
+            );
+            XLSX.utils.book_append_sheet(workbook, mutationWorksheet, 'Riwayat Stok');
             XLSX.writeFile(workbook, 'laporan-stok.xlsx');
         });
     }
@@ -253,6 +314,23 @@
                     item.stock,
                     item.min_stock,
                     item.status
+                ]),
+                styles: { fontSize: 8 }
+            });
+            doc.addPage('a4', 'landscape');
+            doc.setFontSize(14);
+            doc.text('Riwayat Perubahan Stok Terbaru', 14, 14);
+            doc.setFontSize(10);
+            doc.text(`Jumlah Riwayat: ${stockExportData.recentMutations.length}`, 14, 22);
+            doc.autoTable({
+                startY: 30,
+                head: [['No', 'Tanggal', 'Produk', 'Perubahan Stok', 'Petugas']],
+                body: stockExportData.recentMutations.map((item, index) => [
+                    index + 1,
+                    item.date,
+                    item.product,
+                    formatSignedStockChange(item.quantity),
+                    item.operator
                 ]),
                 styles: { fontSize: 8 }
             });

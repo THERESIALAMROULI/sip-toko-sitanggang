@@ -1,10 +1,10 @@
 @extends('layouts.admin')
-@section('title', 'Edit User')
-@section('subtitle', 'Perbarui data user')
+@section('title', 'Edit Pengguna')
+@section('subtitle', 'Edit pengguna')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Edit User</div>
+        <div class="card-title">Edit Pengguna</div>
     </div>
     <div class="card-body">
         <form method="POST" action="{{ route('users.update', $user->id) }}" class="stack-md">
@@ -18,24 +18,18 @@
                         <div class="field-error">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="field">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email', $user->email) }}" required>
-                    @error('email')
-                        <div class="field-error">{{ $message }}</div>
-                    @enderror
-                </div>
                 @if ($hasUsernameColumn)
                     <div class="field">
                         <label for="username">Username</label>
-                        <input id="username" type="text" name="username" value="{{ old('username', $user->username) }}">
+                        <input id="username" type="text" name="username" value="{{ old('username', $user->username) }}" required>
+                        <div class="form-hint">Dipakai saat masuk.</div>
                         @error('username')
                             <div class="field-error">{{ $message }}</div>
                         @enderror
                     </div>
                 @endif
                 <div class="field">
-                    <label for="role">Role</label>
+                    <label for="role">Peran</label>
                     <select id="role" name="role" required>
                         <option value="owner" @selected(old('role', $user->role) === 'owner')>Owner</option>
                         <option value="admin" @selected(old('role', $user->role) === 'admin')>Admin</option>
@@ -58,19 +52,19 @@
                     </div>
                 @endif
                 <div class="field">
-                    <label for="password">Password Baru (opsional)</label>
+                    <label for="password">Password baru (opsional)</label>
                     <input id="password" type="password" name="password">
                     @error('password')
                         <div class="field-error">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="field">
-                    <label for="password_confirmation">Konfirmasi Password Baru</label>
+                    <label for="password_confirmation">Konfirmasi password baru</label>
                     <input id="password_confirmation" type="password" name="password_confirmation">
                 </div>
             </div>
             <div class="td-actions">
-                <button type="submit" class="btn btn-primary">Update User</button>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 <a href="{{ route('users.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
         </form>

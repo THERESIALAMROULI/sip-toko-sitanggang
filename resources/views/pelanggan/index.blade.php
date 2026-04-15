@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Data Pelanggan')
-@section('subtitle', 'Kelola data pelanggan toko')
+@section('subtitle', 'Data pelanggan')
 @section('content')
 <div class="card">
     <div class="card-hd">

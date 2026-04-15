@@ -21,14 +21,13 @@ class PemasokController extends Controller
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:150'],
             'telp' => ['nullable', 'string', 'max:20'],
-            'alamat' => ['nullable', 'string', 'max:255'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
+            'alamat' => ['required', 'string', 'max:255'],
             'aktif' => ['nullable', 'boolean'],
         ]);
         $validated['aktif'] = $request->boolean('aktif', true);
         Pemasok::create($validated);
         return redirect()->route('suppliers.index')
-            ->with('success', 'Pemasok berhasil ditambahkan.');
+            ->with('success', 'Supplier berhasil ditambahkan.');
     }
     public function edit(Pemasok $supplier)
     {
@@ -39,19 +38,18 @@ class PemasokController extends Controller
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:150'],
             'telp' => ['nullable', 'string', 'max:20'],
-            'alamat' => ['nullable', 'string', 'max:255'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
+            'alamat' => ['required', 'string', 'max:255'],
             'aktif' => ['nullable', 'boolean'],
         ]);
         $validated['aktif'] = $request->boolean('aktif', false);
         $supplier->update($validated);
         return redirect()->route('suppliers.index')
-            ->with('success', 'Pemasok berhasil diperbarui.');
+            ->with('success', 'Supplier berhasil diperbarui.');
     }
     public function destroy(Pemasok $supplier)
     {
         $supplier->delete();
         return redirect()->route('suppliers.index')
-            ->with('success', 'Pemasok berhasil dihapus.');
+            ->with('success', 'Supplier berhasil dihapus.');
     }
 }

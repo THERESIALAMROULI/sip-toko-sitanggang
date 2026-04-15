@@ -1,17 +1,17 @@
 @extends('layouts.admin')
-@section('title', 'Manajemen User')
-@section('subtitle', 'Kelola akun owner, admin, dan kasir')
+@section('title', 'Data Pengguna')
+@section('subtitle', 'Data pengguna')
 @section('content')
 <div class="stack-lg">
     <div class="card">
         <div class="card-hd">
-            <div class="card-title">Filter User</div>
+            <div class="card-title">Filter Pengguna</div>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('users.index') }}" class="search-row">
-                <input type="text" name="q" class="search-input" placeholder="Cari nama/email/username..." value="{{ $filters['q'] ?? '' }}">
+                <input type="text" name="q" class="search-input" placeholder="Cari nama/username..." value="{{ $filters['q'] ?? '' }}">
                 <select name="role" class="filter-sel">
-                    <option value="">Semua Role</option>
+                    <option value="">Semua Peran</option>
                     <option value="owner" @selected(($filters['role'] ?? null) === 'owner')>Owner</option>
                     <option value="admin" @selected(($filters['role'] ?? null) === 'admin')>Admin</option>
                     <option value="kasir" @selected(($filters['role'] ?? null) === 'kasir')>Kasir</option>
@@ -30,14 +30,14 @@
     </div>
     <div class="card">
         <div class="card-hd">
-            <div class="card-title">Daftar User</div>
-            <a href="{{ route('users.create') }}" class="btn btn-primary">+ Tambah User</a>
+            <div class="card-title">Daftar Pengguna</div>
+            <a href="{{ route('users.create') }}" class="btn btn-primary">+ Tambah Pengguna</a>
         </div>
         <div class="card-body">
             @if ($users->isEmpty())
                 <div class="empty-state">
                     <div class="es-icon">-</div>
-                    <p>Belum ada user.</p>
+                    <p>Belum ada pengguna.</p>
                 </div>
             @else
                 <div class="tbl-wrap">
@@ -49,8 +49,7 @@
                             @if ($hasUsernameColumn)
                                 <th>Username</th>
                             @endif
-                            <th>Email</th>
-                            <th>Role</th>
+                            <th>Peran</th>
                             @if ($hasStatusColumn)
                                 <th>Status</th>
                             @endif
@@ -65,8 +64,7 @@
                                 @if ($hasUsernameColumn)
                                     <td>{{ $user->username ?: '-' }}</td>
                                 @endif
-                                <td>{{ $user->email }}</td>
-                                <td><span class="badge badge-blue">{{ strtoupper($user->role) }}</span></td>
+                                <td><span class="badge badge-blue">{{ ucfirst($user->role) }}</span></td>
                                 @if ($hasStatusColumn)
                                     <td>
                                         @if (($user->status ?? 'aktif') === 'aktif')
@@ -92,7 +90,7 @@
                                             <form action="{{ route('users.destroy', $user->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus user ini?')">Hapus</button>
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Hapus pengguna ini?')">Hapus</button>
                                             </form>
                                         @endif
                                     </div>

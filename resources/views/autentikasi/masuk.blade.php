@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <h2 class="auth-title">Masuk ke Sistem</h2>
-    <p class="auth-muted">Gunakan username dan password akun Anda.</p>
+    <h2 class="auth-title">Masuk</h2>
+    <p class="auth-muted">Pakai username dan password.</p>
     @if (session('status'))
         <div class="auth-status success">{{ session('status') }}</div>
     @endif
@@ -15,14 +15,14 @@
         @csrf
         <div class="auth-field">
             <label for="username">Username</label>
-            <input id="username" type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username" placeholder="Masukkan username">
+            <input id="username" type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username" placeholder="Username">
             @error('username')
                 <div class="field-error">{{ $message }}</div>
             @enderror
         </div>
         <div class="auth-field">
             <label for="password">Password</label>
-            <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="Masukkan password">
+            <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="Password">
             @error('password')
                 <div class="field-error">{{ $message }}</div>
             @enderror
@@ -33,6 +33,6 @@
                 <span>Ingat saya</span>
             </label>
         </div>
-        <button type="submit" class="auth-btn">Masuk ke Sistem</button>
+        <button type="submit" class="auth-btn">Masuk</button>
     </form>
 </x-guest-layout>

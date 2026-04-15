@@ -11,7 +11,7 @@ return new class extends Migration
         $columnWasAdded = false;
         if (! Schema::hasColumn('users', 'username')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->string('username', 50)->nullable()->after('email');
+                $table->string('username', 50)->nullable()->after('name');
             });
             $columnWasAdded = true;
         }
@@ -22,7 +22,7 @@ return new class extends Migration
             ->map(fn ($username) => Str::lower((string) $username))
             ->all();
         DB::table('users')
-            ->select('id', 'name', 'email', 'username')
+            ->select('id', 'name', 'username')
             ->orderBy('id')
             ->get()
             ->each(function (object $user) use (&$reservedUsernames) {
@@ -46,9 +46,7 @@ return new class extends Migration
     }
     private function generateUniqueUsername(object $user, array $reservedUsernames): string
     {
-        $emailPrefix = Str::before((string) ($user->email ?? ''), '@');
-        $baseUsername = blank($emailPrefix) ? (string) ($user->name ?? '') : $emailPrefix;
-        $baseUsername = Str::of($baseUsername)
+        $baseUsername = Str::of((string) ($user->name ?? ''))
             ->ascii()
             ->lower()
             ->replaceMatches('/[^a-z0-9_]+/', '')

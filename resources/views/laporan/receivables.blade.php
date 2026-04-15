@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 @section('title', 'Laporan Utang')
-@section('subtitle', 'Analisis data piutang pelanggan')
+@section('subtitle', 'Laporan piutang')
 @section('content')
 <div class="stack-lg">
     <div class="card">
         <div class="card-hd">
-            <div class="card-title">Filter Laporan Utang</div>
+            <div class="card-title">Filter Laporan Piutang</div>
             <div class="td-actions">
                 <button type="button" class="btn btn-secondary" id="exportReceivablesExcel">Unduh Excel</button>
                 <button type="button" class="btn btn-outline" id="exportReceivablesPdf">Unduh PDF</button>

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\Kategori;
 use App\Models\Produk;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 class ProdukController extends Controller
 {
     public function index()
@@ -31,6 +32,13 @@ class ProdukController extends Controller
             'stok_minimum' => ['required', 'integer', 'min:0'],
             'aktif' => ['nullable', 'boolean'],
         ]);
+
+        if ((int) $validated['stok'] <= (int) $validated['stok_minimum']) {
+            throw ValidationException::withMessages([
+                'stok' => 'Untuk produk baru, stok awal harus lebih besar dari stok minimum.',
+            ]);
+        }
+
         $validated['aktif'] = $request->boolean('aktif', true);
         Produk::create($validated);
         return redirect()->route('products.index')
@@ -54,6 +62,14 @@ class ProdukController extends Controller
             'stok_minimum' => ['required', 'integer', 'min:0'],
             'aktif' => ['nullable', 'boolean'],
         ]);
+
+        $hasSalesHistory = $product->transactionDetails()->exists();
+        if (! $hasSalesHistory && (int) $validated['stok'] <= (int) $validated['stok_minimum']) {
+            throw ValidationException::withMessages([
+                'stok' => 'Produk yang belum pernah terjual harus memiliki stok di atas stok minimum.',
+            ]);
+        }
+
         $validated['aktif'] = $request->boolean('aktif', false);
         $product->update($validated);
         return redirect()->route('products.index')

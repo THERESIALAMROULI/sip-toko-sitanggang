@@ -1,17 +1,17 @@
 @extends('layouts.admin')
-@section('title', 'Data Kategori')
-@section('subtitle', 'Kelola kategori produk sesuai ERD')
+@section('title', 'Kategori Produk')
+@section('subtitle', 'Data kategori produk')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Daftar Kategori</div>
-        <a href="{{ route('kategoris.create') }}" class="btn btn-primary">+ Tambah Kategori</a>
+        <div class="card-title">Daftar Kategori Produk</div>
+        <a href="{{ route('kategoris.create') }}" class="btn btn-primary">+ Tambah Kategori Produk</a>
     </div>
     <div class="card-body">
         @if ($kategoris->isEmpty())
             <div class="empty-state">
                 <div class="es-icon">-</div>
-                <p>Belum ada data kategori.</p>
+                <p>Belum ada data kategori produk.</p>
             </div>
         @else
             <div class="tbl-wrap">

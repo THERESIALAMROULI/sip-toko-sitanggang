@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Tambah Biaya Operasional')
-@section('subtitle', 'Masukkan data pengeluaran operasional toko')
+@section('subtitle', 'Tambah pengeluaran')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Biaya Operasional</div>
+        <div class="card-title">Data Pengeluaran</div>
     </div>
     <div class="card-body">
         <form action="{{ route('expenses.store') }}" method="POST" class="stack-md">

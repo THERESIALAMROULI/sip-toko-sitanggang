@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Tambah Pelanggan')
-@section('subtitle', 'Masukkan data pelanggan baru')
+@section('subtitle', 'Tambah pelanggan')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Pelanggan</div>
+        <div class="card-title">Data Pelanggan</div>
     </div>
     <div class="card-body">
         <form action="{{ route('customers.store') }}" method="POST" class="stack-md">
@@ -26,7 +26,7 @@
                 </div>
                 <div class="field field-full">
                     <label for="address">Alamat</label>
-                    <textarea id="address" name="address" placeholder="Alamat pelanggan (opsional)">{{ old('address') }}</textarea>
+                    <textarea id="address" name="address" placeholder="Masukkan alamat pelanggan" required>{{ old('address') }}</textarea>
                     @error('address')
                         <div class="field-error">{{ $message }}</div>
                     @enderror

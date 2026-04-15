@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Biaya Operasional')
-@section('subtitle', 'Catat dan pantau pengeluaran operasional toko')
+@section('subtitle', 'Data pengeluaran')
 @section('content')
 <div class="stack-lg">
     <div class="card">

@@ -165,9 +165,13 @@ class LaporanController extends Controller
                 $productsQuery->where('aktif', true)->whereColumn('stok', '>', 'stok_minimum');
             }
         }
-        $products = $productsQuery
+        $exportProducts = (clone $productsQuery)
             ->orderBy('nama')
             ->get();
+        $products = (clone $productsQuery)
+            ->orderBy('nama')
+            ->paginate(10)
+            ->withQueryString();
         $totalProducts = Produk::query()->count();
         $lowStockCount = Produk::query()
             ->where('aktif', true)
@@ -192,6 +196,7 @@ class LaporanController extends Controller
             ->get();
         return view('laporan.stock', compact(
             'products',
+            'exportProducts',
             'totalProducts',
             'lowStockCount',
             'outStockCount',

@@ -33,7 +33,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('customers', PelangganController::class)->except(['show']);
     Route::resource('expense_categories', KategoriPengeluaranController::class)->except(['show']);
     Route::resource('expenses', PengeluaranController::class)->except(['show']);
-    Route::resource('stok_histories', RiwayatStokController::class)->except(['show']);
+    Route::get('stok_histories/{stokHistory}/correction', [RiwayatStokController::class, 'createCorrection'])
+        ->name('stok_histories.correction');
+    Route::resource('stok_histories', RiwayatStokController::class)->only([
+        'index',
+        'create',
+        'store',
+    ]);
 });
 // Modul kasir fokus pada proses operasional harian: cek stok, transaksi, dan pelunasan piutang.
 Route::middleware(['auth', 'role:kasir'])->group(function () {
@@ -51,12 +57,15 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
         'update',
     ]);
 });
-// Modul laporan disediakan untuk admin dan owner agar bisa memantau performa usaha.
+// Laporan stok tetap dipakai admin dan owner untuk keputusan persediaan harian.
 Route::middleware(['auth', 'role:admin,owner'])->group(function () {
-    Route::get('/reports/receivables', [LaporanController::class, 'receivables'])
-        ->name('reports.receivables');
     Route::get('/reports/stock', [LaporanController::class, 'stock'])
         ->name('reports.stock');
+});
+// Laporan strategis lain dipusatkan di owner agar fokus admin tetap operasional.
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::get('/reports/receivables', [LaporanController::class, 'receivables'])
+        ->name('reports.receivables');
     Route::get('/reports/expenses', [LaporanController::class, 'expenses'])
         ->name('reports.expenses');
     Route::get('/reports/sales', [LaporanController::class, 'sales'])

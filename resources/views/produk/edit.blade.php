@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 @section('title', 'Edit Produk')
-@section('subtitle', 'Perbarui data produk')
+@section('subtitle', 'Edit produk')
 @section('content')
 <div class="card">
     <div class="card-hd">
-        <div class="card-title">Form Edit Produk</div>
+        <div class="card-title">Edit Produk</div>
     </div>
     <div class="card-body">
         <form method="POST" action="{{ route('products.update', $product->id) }}" class="stack-md">
@@ -46,6 +46,7 @@
                 <div class="field">
                     <label for="stok">Stok</label>
                     <input id="stok" type="number" name="stok" value="{{ old('stok', $product->stok) }}" min="0" required>
+                    <div class="form-hint">Pastikan stok tetap di atas batas minimum.</div>
                     @error('stok')
                         <div class="field-error">{{ $message }}</div>
                     @enderror
@@ -69,7 +70,7 @@
                 </div>
             </div>
             <div class="td-actions">
-                <button type="submit" class="btn btn-primary">Update Produk</button>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 <a href="{{ route('products.index') }}" class="btn btn-secondary">Batal</a>
             </div>
         </form>
