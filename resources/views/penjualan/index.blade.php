@@ -43,7 +43,7 @@
     <div class="card">
         <div class="card-hd">
             <div class="card-title">Daftar Transaksi</div>
-            <span class="badge badge-blue">{{ $transactions->count() }} transaksi</span>
+            <span class="badge badge-blue">{{ number_format($transactions->total(), 0, ',', '.') }} transaksi</span>
         </div>
         <div class="card-body">
             @if ($transactions->isEmpty())
@@ -98,6 +98,35 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($transactions->hasPages())
+                    <div class="pagination-bar">
+                        <div class="table-sub">
+                            Menampilkan {{ $transactions->firstItem() }}-{{ $transactions->lastItem() }} dari {{ $transactions->total() }} transaksi
+                        </div>
+                        <div class="pagination-pages">
+                            @if ($transactions->onFirstPage())
+                                <span class="btn btn-secondary btn-sm" aria-disabled="true">Sebelumnya</span>
+                            @else
+                                <a href="{{ $transactions->previousPageUrl() }}" class="btn btn-secondary btn-sm">Sebelumnya</a>
+                            @endif
+
+                            @foreach ($transactions->getUrlRange(1, $transactions->lastPage()) as $page => $url)
+                                @if ($page === $transactions->currentPage())
+                                    <span class="btn btn-primary btn-sm" aria-current="page">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}" class="btn btn-secondary btn-sm">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            @if ($transactions->hasMorePages())
+                                <a href="{{ $transactions->nextPageUrl() }}" class="btn btn-secondary btn-sm">Berikutnya</a>
+                            @else
+                                <span class="btn btn-secondary btn-sm" aria-disabled="true">Berikutnya</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             @endif
         </div>
     </div>

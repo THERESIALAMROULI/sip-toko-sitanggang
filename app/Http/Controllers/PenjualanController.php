@@ -45,7 +45,8 @@ class PenjualanController extends Controller
         }
         $transactions = $transactionsQuery
             ->orderByDesc('tanggal')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
         $filters = [
             'q' => $validated['q'] ?? null,
             'payment_type' => $validated['payment_type'] ?? null,

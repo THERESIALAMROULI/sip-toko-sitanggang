@@ -20,7 +20,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="form-hint">Wajib untuk pembayaran utang.</div>
+                    <div class="form-hint">Pilih pelanggan jika ingin transaksi utang. Pembeli umum hanya bisa tunai.</div>
                     @error('customer_id')
                         <div class="field-error">{{ $message }}</div>
                     @enderror
@@ -32,6 +32,7 @@
                         <option value="tunai" @selected(old('payment_type') === 'tunai')>Tunai</option>
                         <option value="utang" @selected(old('payment_type') === 'utang')>Utang (Piutang)</option>
                     </select>
+                    <div class="form-hint" id="payment-type-hint">Pilih metode pembayaran sesuai jenis transaksi.</div>
                     @error('payment_type')
                         <div class="field-error">{{ $message }}</div>
                     @enderror
@@ -146,14 +147,33 @@
         const changeField = document.getElementById('change-field');
         const dueDateField = document.getElementById('due-date-field');
         const customerInput = document.getElementById('customer_id');
+        const paymentTypeHint = document.getElementById('payment-type-hint');
         const cashInput = document.getElementById('cash_received');
         const dueDateInput = document.getElementById('due_date');
         const changePreview = document.getElementById('change_preview');
+        const utangOption = paymentTypeSelect?.querySelector('option[value="utang"]');
         if (!quantityInputs.length || !totalElement) {
             return;
         }
         const formatRupiah = (value) => `Rp ${new Intl.NumberFormat('id-ID').format(value)}`;
+        const syncPaymentTypeAvailability = () => {
+            const hasCustomer = Boolean(customerInput?.value);
+            if (utangOption) {
+                utangOption.disabled = !hasCustomer;
+            }
+            if (paymentTypeSelect && !hasCustomer && (paymentTypeSelect.value === '' || paymentTypeSelect.value === 'utang')) {
+                paymentTypeSelect.value = 'tunai';
+            }
+            if (paymentTypeHint) {
+                paymentTypeHint.textContent = hasCustomer
+                    ? 'Pelanggan bisa memakai tunai atau utang.'
+                    : 'Pembeli umum hanya bisa menggunakan pembayaran tunai.';
+            }
+
+            return hasCustomer;
+        };
         const togglePaymentFields = () => {
+            syncPaymentTypeAvailability();
             const mode = paymentTypeSelect ? paymentTypeSelect.value : '';
             const isTunai = mode === 'tunai';
             const isUtang = mode === 'utang';
@@ -214,6 +234,12 @@
         });
         if (paymentTypeSelect) {
             paymentTypeSelect.addEventListener('change', () => {
+                togglePaymentFields();
+                updateTotals();
+            });
+        }
+        if (customerInput) {
+            customerInput.addEventListener('change', () => {
                 togglePaymentFields();
                 updateTotals();
             });
