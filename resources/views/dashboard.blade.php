@@ -4,13 +4,9 @@
     $isAdminDashboard = $role === 'admin';
 @endphp
 @section('title', 'Dashboard')
-@section('subtitle', $isDecisionRole ? 'Ringkasan keputusan' : ($isAdminDashboard ? 'Ringkasan admin' : 'Ringkasan hari ini'))
+@section('subtitle', $isDecisionRole ? '' : ($isAdminDashboard ? 'Ringkasan admin' : 'Ringkasan hari ini'))
 @section('content')
 @if ($isDecisionRole)
-    <div class="alert alert-info">
-        Lihat prioritas stok, penjualan, dan piutang dari {{ number_format($totalProducts, 0, ',', '.') }} produk aktif.
-    </div>
-
     <div class="stat-grid">
         <div class="stat-card sc-blue">
             <div class="sc-label">Periode Teramai</div>
@@ -37,92 +33,14 @@
             </div>
         </div>
         <div class="stat-card sc-amber">
-            <div class="sc-label">Produk Kunci Saat Puncak</div>
-            <div class="sc-value sc-compact">{{ $peakMonthLeader->product_name ?? '-' }}</div>
-            <div class="sc-sub">
-                @if ($peakMonthLeader)
-                    {{ number_format($peakMonthLeader->qty_sold, 0, ',', '.') }} item terjual pada {{ $peakMonthLabel }}
-                @else
-                    Belum ada produk unggulan
-                @endif
-            </div>
+            <div class="sc-label">Total Penjualan</div>
+            <div class="sc-value mono">Rp {{ number_format($ownerTotalSales, 0, ',', '.') }}</div>
+            <div class="sc-sub">{{ number_format($ownerTotalTransactions, 0, ',', '.') }} transaksi</div>
         </div>
         <div class="stat-card sc-red">
-            <div class="sc-label">Prioritas Restok</div>
-            <div class="sc-value">{{ number_format($restockPriorityCount, 0, ',', '.') }}</div>
-            <div class="sc-sub">{{ number_format($slowMoverCount, 0, ',', '.') }} produk lambat laku dalam 30 hari</div>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Musim Ramai Toko</div>
-                <span class="badge badge-blue">12 bulan terakhir</span>
-            </div>
-            <div class="card-body">
-                @if ($peakMonth || $peakDay)
-                    <div class="insight-list">
-                        <div class="insight-item">
-                            <div class="insight-eyebrow">Periode omzet tertinggi</div>
-                            <div class="insight-main">{{ $peakMonthLabel ?? '-' }}</div>
-                            <div class="insight-sub">
-                                @if ($peakMonth)
-                                    Rp {{ number_format($peakMonth->total_sales, 0, ',', '.') }} dari {{ number_format($peakMonth->transaction_count, 0, ',', '.') }} transaksi.
-                                    @if ($peakMonthLeader)
-                                        Produk paling laris: {{ $peakMonthLeader->product_name }} ({{ number_format($peakMonthLeader->qty_sold, 0, ',', '.') }} item).
-                                    @endif
-                                @else
-                                    Data periode puncak belum tersedia.
-                                @endif
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-eyebrow">Hari paling sibuk</div>
-                            <div class="insight-main">{{ $peakDayLabel ?? '-' }}</div>
-                            <div class="insight-sub">
-                                @if ($peakDay)
-                                    {{ number_format($peakDay->transaction_count, 0, ',', '.') }} transaksi dan omzet Rp {{ number_format($peakDay->total_sales, 0, ',', '.') }}.
-                                    @if ($peakDayLeader)
-                                        Produk terlaris hari itu: {{ $peakDayLeader->product_name }}.
-                                    @endif
-                                @else
-                                    Data puncak harian belum tersedia.
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Belum ada data penjualan.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Arah Tindakan</div>
-                <span class="badge badge-amber">{{ $decisionWindowLabel }}</span>
-            </div>
-            <div class="card-body">
-                @if ($decisionHighlights->isEmpty())
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Belum ada ringkasan prioritas.</p>
-                    </div>
-                @else
-                    <div class="stack-sm">
-                        @foreach ($decisionHighlights as $highlight)
-                            <div class="decision-note">
-                                <div class="decision-note-title">{{ $highlight['title'] }}</div>
-                                <div class="decision-note-text">{{ $highlight['text'] }}</div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
+            <div class="sc-label">Total Belum Lunas</div>
+            <div class="sc-value mono">Rp {{ number_format($ownerTotalUnpaid, 0, ',', '.') }}</div>
+            <div class="sc-sub">Piutang berjalan</div>
         </div>
     </div>
 
@@ -138,36 +56,31 @@
         </div>
         <div class="card">
             <div class="card-hd">
-                <div class="card-title">
-                    Top Produk Saat {{ $peakMonthLabel ?? 'Periode Puncak' }}
-                </div>
+                <div class="card-title">Distribusi Status Stok</div>
+                <span class="badge badge-blue">Ringkasan cepat</span>
             </div>
             <div class="card-body">
-                @if ($peakMonthTopProducts->isEmpty())
+                @if (array_sum($ownerStockStatusChartValues) === 0)
                     <div class="empty-state">
                         <div class="es-icon">-</div>
-                        <p>Belum ada produk terlaris pada periode puncak.</p>
+                        <p>Belum ada data status stok untuk divisualisasikan.</p>
                     </div>
                 @else
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th>Qty</th>
-                                <th>Total</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($peakMonthTopProducts as $item)
-                                <tr>
-                                    <td>{{ $item->product_name }}</td>
-                                    <td class="mono">{{ number_format($item->qty_sold, 0, ',', '.') }}</td>
-                                    <td class="mono">Rp {{ number_format($item->total_sales, 0, ',', '.') }}</td>
-                                </tr>
+                    <div class="stock-report-chart-layout">
+                        <div class="stock-report-chart-wrap">
+                            <canvas id="ownerStockStatusChart" height="170"></canvas>
+                        </div>
+                        <div class="stock-report-status-list">
+                            @foreach ($ownerStockStatusSummary as $item)
+                                <div class="stock-report-status-item">
+                                    <div class="stock-report-status-main">
+                                        <span class="badge {{ $item['badge'] }}">{{ $item['label'] }}</span>
+                                        <div class="stock-report-status-count">{{ number_format($item['count'], 0, ',', '.') }} produk</div>
+                                    </div>
+                                    <div class="table-sub">{{ $item['note'] }}</div>
+                                </div>
                             @endforeach
-                            </tbody>
-                        </table>
+                        </div>
                     </div>
                 @endif
             </div>
@@ -177,174 +90,60 @@
     <div class="grid-2 mb-4">
         <div class="card">
             <div class="card-hd">
-                <div class="card-title">Prioritas Restok</div>
-                <span class="badge badge-red">30 hari terakhir</span>
+                <div class="card-title">Grafik Status Piutang</div>
             </div>
             <div class="card-body">
-                @if ($restockPriorities->isEmpty())
+                @if (array_sum($ownerReceivableStatusChartValues) === 0)
                     <div class="empty-state">
                         <div class="es-icon">-</div>
-                        <p>Belum ada produk prioritas restok.</p>
+                        <p>Belum ada data piutang untuk divisualisasikan.</p>
                     </div>
                 @else
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th>Stok</th>
-                                <th>Terjual</th>
-                                <th>Daya Tahan</th>
-                                <th>Saran Restok</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($restockPriorities as $product)
-                                <tr>
-                                    <td>
-                                        <div>{{ $product->nama }}</div>
-                                        <div class="table-sub">{{ $product->category_name ?? '-' }}</div>
-                                    </td>
-                                    <td class="mono">{{ number_format($product->stok, 0, ',', '.') }}</td>
-                                    <td class="mono">{{ number_format($product->qty_sold_30, 0, ',', '.') }}</td>
-                                    <td>
-                                        @if ($product->stock_cover_days !== null)
-                                            <span class="badge {{ $product->stock_cover_days <= 7 ? 'badge-red' : 'badge-amber' }}">
-                                                {{ rtrim(rtrim(number_format($product->stock_cover_days, 1, ',', '.'), '0'), ',') }} hari
-                                            </span>
-                                        @else
-                                            <span class="badge badge-gray">Belum terbaca</span>
-                                        @endif
-                                    </td>
-                                    <td class="mono">{{ number_format($product->suggested_restock, 0, ',', '.') }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                    <div class="stock-report-chart-layout">
+                        <div class="stock-report-chart-wrap">
+                            <canvas id="ownerReceivableStatusChart" height="170"></canvas>
+                        </div>
+                        <div class="stock-report-status-list">
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-amber">Belum Lunas</span>
+                                    <div class="stock-report-status-count">{{ $ownerReceivableUnpaidPercent }}%</div>
+                                </div>
+                                <div class="table-sub">Masih menjadi tagihan yang belum selesai.</div>
+                            </div>
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-red">Lewat Jatuh Tempo</span>
+                                    <div class="stock-report-status-count">{{ $ownerReceivableOverduePercent }}%</div>
+                                </div>
+                                <div class="table-sub">Perlu ditagih lebih dulu agar arus kas aman.</div>
+                            </div>
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-blue">Kondisi Keuangan</span>
+                                    <div class="stock-report-status-count">{{ $ownerReceivableHealthLabel }}</div>
+                                </div>
+                                <div class="table-sub">Dilihat dari porsi piutang yang sudah melewati jatuh tempo.</div>
+                            </div>
+                        </div>
                     </div>
                 @endif
             </div>
         </div>
-
         <div class="card">
             <div class="card-hd">
-                <div class="card-title">Produk Lambat Laku</div>
-                <span class="badge badge-gray">Tidak terjual 30 hari</span>
+                <div class="card-title">Pembagian Pengeluaran</div>
             </div>
             <div class="card-body">
-                @if ($slowMovingProducts->isEmpty())
+                @if (empty($ownerExpenseCategoryLabels))
                     <div class="empty-state">
                         <div class="es-icon">-</div>
-                        <p>Belum ada produk lambat laku.</p>
+                        <p>Belum ada data biaya untuk ditampilkan.</p>
                     </div>
                 @else
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th>Stok</th>
-                                <th>Terakhir Laku</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($slowMovingProducts->take(8) as $product)
-                                <tr>
-                                    <td>
-                                        <div>{{ $product->nama }}</div>
-                                        <div class="table-sub">{{ $product->category_name ?? '-' }}</div>
-                                    </td>
-                                    <td class="mono">{{ number_format($product->stok, 0, ',', '.') }}</td>
-                                    <td>
-                                        @if ($product->days_since_last_sale !== null)
-                                            {{ number_format($product->days_since_last_sale, 0, ',', '.') }} hari lalu
-                                        @else
-                                            Belum pernah terjual
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                    <div style="max-width: 380px; height: 320px; margin: 0 auto;">
+                        <canvas id="ownerExpenseCategoryChart" height="220"></canvas>
                     </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-2">
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Kategori Penggerak Omzet</div>
-                <span class="badge badge-blue">{{ $decisionWindowLabel }}</span>
-            </div>
-            <div class="card-body stack-md">
-                @if ($categoryLeaders->isEmpty())
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Belum ada kategori utama.</p>
-                    </div>
-                @else
-                    <canvas id="categorySalesChart" height="110"></canvas>
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Kategori</th>
-                                <th>Qty</th>
-                                <th>Total</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($categoryLeaders as $category)
-                                <tr>
-                                    <td>{{ $category->category_name }}</td>
-                                    <td class="mono">{{ number_format($category->qty_sold, 0, ',', '.') }}</td>
-                                    <td class="mono">Rp {{ number_format($category->total_sales, 0, ',', '.') }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Piutang Risiko Tinggi</div>
-                <span class="badge badge-red">Rp {{ number_format($overdueReceivablesAmount, 0, ',', '.') }}</span>
-            </div>
-            <div class="card-body">
-                @if ($overdueReceivables->isEmpty())
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Tidak ada piutang yang lewat jatuh tempo.</p>
-                    </div>
-                @else
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Pelanggan</th>
-                                <th>Transaksi</th>
-                                <th>Jatuh Tempo</th>
-                                <th>Jumlah</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($overdueReceivables as $receivable)
-                                <tr>
-                                    <td>{{ $receivable->transaction->customer->name ?? '-' }}</td>
-                                    <td>#{{ $receivable->transaction_id }}</td>
-                                    <td>{{ optional($receivable->due_date)->format('d-m-Y') ?? '-' }}</td>
-                                    <td class="mono">Rp {{ number_format($receivable->amount, 0, ',', '.') }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="table-sub mt-2">{{ number_format($overdueReceivablesCount, 0, ',', '.') }} piutang perlu ditindaklanjuti.</div>
                 @endif
             </div>
         </div>
@@ -947,34 +746,24 @@
                 }
             });
 
-            createChart('categorySalesChart', {
-                type: 'bar',
+            createChart('ownerStockStatusChart', {
+                type: 'doughnut',
                 data: {
-                    labels: {!! json_encode($categoryChartLabels) !!},
+                    labels: {!! json_encode($ownerStockStatusChartLabels) !!},
                     datasets: [{
-                        label: 'Total Penjualan',
-                        data: {!! json_encode($categoryChartValues) !!},
+                        data: {!! json_encode($ownerStockStatusChartValues) !!},
                         backgroundColor: [
-                            'rgba(28, 77, 141, 0.78)',
-                            'rgba(73, 136, 196, 0.78)',
-                            'rgba(16, 185, 129, 0.78)',
-                            'rgba(245, 158, 11, 0.78)',
-                            'rgba(239, 68, 68, 0.78)'
+                            'rgba(16, 185, 129, 0.82)',
+                            'rgba(245, 158, 11, 0.82)',
+                            'rgba(239, 68, 68, 0.82)'
                         ],
-                        borderRadius: 6
+                        borderColor: '#ffffff',
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: (value) => formatRupiah(value)
-                            }
-                        }
-                    },
                     plugins: {
                         legend: {
                             display: false
@@ -982,6 +771,72 @@
                     }
                 }
             });
+
+            createChart('ownerExpenseCategoryChart', {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($ownerExpenseCategoryLabels) !!},
+                    datasets: [{
+                        data: {!! json_encode($ownerExpenseCategoryTotals) !!},
+                        backgroundColor: [
+                            'rgba(28, 77, 141, 0.82)',
+                            'rgba(73, 136, 196, 0.82)',
+                            'rgba(245, 158, 11, 0.82)',
+                            'rgba(16, 185, 129, 0.82)',
+                            'rgba(239, 68, 68, 0.82)',
+                            'rgba(107, 114, 128, 0.82)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            createChart('ownerReceivableStatusChart', {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($ownerReceivableStatusChartLabels) !!},
+                    datasets: [{
+                        data: {!! json_encode($ownerReceivableStatusChartValues) !!},
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.82)',
+                            'rgba(16, 185, 129, 0.82)',
+                            'rgba(239, 68, 68, 0.82)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${formatRupiah(ctx.raw)}`
+                            }
+                        }
+                    }
+                }
+            });
+
         })();
     </script>
     @endpush

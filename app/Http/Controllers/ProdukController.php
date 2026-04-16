@@ -6,13 +6,84 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 class ProdukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Produk::query()
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:150'],
+            'status' => ['nullable', 'in:all,habis,menipis,normal'],
+        ]);
+
+        $search = trim((string) ($validated['q'] ?? ''));
+        $selectedStatus = $validated['status'] ?? 'all';
+
+        $productsQuery = Produk::query()
             ->with('kategori')
-            ->orderBy('nama')
-            ->get();
-        return view('produk.index', compact('products'));
+            ->orderBy('nama');
+
+        if ($search !== '') {
+            $productsQuery->where('nama', 'like', '%'.$search.'%');
+        }
+
+        if ($selectedStatus === 'habis') {
+            $productsQuery->where('stok', '<=', 0);
+        } elseif ($selectedStatus === 'menipis') {
+            $productsQuery->where('stok', '>', 0)
+                ->whereColumn('stok', '<=', 'stok_minimum');
+        } elseif ($selectedStatus === 'normal') {
+            $productsQuery->whereColumn('stok', '>', 'stok_minimum');
+        }
+
+        $productGroups = collect([
+            [
+                'key' => 'all',
+                'label' => 'Semua',
+                'badge' => 'badge-blue',
+                'count' => Produk::query()->count(),
+            ],
+            [
+                'key' => 'habis',
+                'label' => 'Habis',
+                'badge' => 'badge-red',
+                'count' => Produk::query()->where('stok', '<=', 0)->count(),
+            ],
+            [
+                'key' => 'menipis',
+                'label' => 'Menipis',
+                'badge' => 'badge-amber',
+                'count' => Produk::query()
+                    ->where('stok', '>', 0)
+                    ->whereColumn('stok', '<=', 'stok_minimum')
+                    ->count(),
+            ],
+            [
+                'key' => 'normal',
+                'label' => 'Normal',
+                'badge' => 'badge-green',
+                'count' => Produk::query()
+                    ->whereColumn('stok', '>', 'stok_minimum')
+                    ->count(),
+            ],
+        ]);
+
+        $products = $productsQuery
+            ->paginate(5)
+            ->withQueryString()
+            ->through(function (Produk $product) {
+                if ((int) $product->stok <= 0) {
+                    $product->stock_status_label = 'Habis';
+                    $product->stock_badge = 'badge-red';
+                } elseif ((int) $product->stok <= (int) $product->stok_minimum) {
+                    $product->stock_status_label = 'Menipis';
+                    $product->stock_badge = 'badge-amber';
+                } else {
+                    $product->stock_status_label = 'Normal';
+                    $product->stock_badge = 'badge-green';
+                }
+
+                return $product;
+            });
+
+        return view('produk.index', compact('products', 'productGroups', 'selectedStatus', 'search'));
     }
     public function create()
     {

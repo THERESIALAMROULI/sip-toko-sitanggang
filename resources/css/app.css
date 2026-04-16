@@ -637,6 +637,72 @@ button {
     gap: 8px;
     flex-wrap: wrap;
 }
+.product-group-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.report-filter-note {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--g500);
+}
+.stock-report-chart-layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+}
+.stock-report-chart-wrap {
+    position: relative;
+    height: 190px;
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+}
+.sales-report-chart-wrap {
+    position: relative;
+    height: 320px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+.stock-report-status-list {
+    display: grid;
+    gap: 10px;
+}
+.stock-report-status-item {
+    border: 1px solid var(--g200);
+    border-radius: 8px;
+    background: var(--g50);
+    padding: 12px 14px;
+}
+.stock-report-status-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.stock-report-status-count {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--g900);
+}
+.stock-report-product {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--g900);
+    word-break: break-word;
+}
+.stock-report-stock,
+.stock-report-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--g900);
+    line-height: 1.2;
+}
 .search-input {
     flex: 1;
     min-width: 180px;
@@ -1188,6 +1254,15 @@ tbody tr:hover td {
     }
     .admin-item-meta {
         justify-content: flex-start;
+    }
+    .stock-report-chart-layout {
+        grid-template-columns: 1fr;
+    }
+    .stock-report-chart-wrap {
+        max-width: 200px;
+    }
+    .sales-report-chart-wrap {
+        height: 280px;
     }
 }
 @media (max-width: 580px) {

@@ -6,6 +6,7 @@ use App\Models\Produk;
 use App\Models\Piutang;
 use App\Models\Penjualan;
 use App\Models\DetailPenjualan;
+use App\Models\RiwayatStok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -104,12 +105,29 @@ class PenjualanController extends Controller
                         'products' => 'Stok produk '.$product->name.' tidak cukup.',
                     ]);
                 }
+
+                $stockBefore = (int) $product->stock;
+                $stockAfter = $stockBefore - $quantity;
+
                 $product->decrement('stok', $quantity);
+
+                RiwayatStok::create([
+                    'produk_id' => $product->id,
+                    'supplier_id' => null,
+                    'user_id' => auth()->id() ?? 1,
+                    'jumlah' => -1 * $quantity,
+                    'stok_sebelum' => $stockBefore,
+                    'stok_sesudah' => $stockAfter,
+                    'keterangan' => 'Penjualan #'.$transaction->id,
+                    'tanggal' => now(),
+                ]);
+
                 $subtotal = $product->price * $quantity;
                 $total += $subtotal;
                 DetailPenjualan::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $product->id,
+                    'harga_beli' => (int) $product->harga_beli,
                     'price' => $product->price,
                     'quantity' => $quantity,
                     'subtotal' => $subtotal,

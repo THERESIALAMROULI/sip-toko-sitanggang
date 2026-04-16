@@ -8,6 +8,7 @@ class DetailPenjualan extends Model
         'transaction_id',
         'product_id',
         'nama_produk',
+        'harga_beli',
         'quantity',
         'price',
         'subtotal',

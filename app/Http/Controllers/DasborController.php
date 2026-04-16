@@ -133,6 +133,19 @@ class DasborController extends Controller
         $slowMovingProducts = collect();
         $decisionHighlights = collect();
         $adminCategoryCheckProducts = collect();
+        $ownerTotalSales = 0;
+        $ownerTotalTransactions = 0;
+        $ownerTotalUnpaid = 0;
+        $ownerStockStatusChartLabels = ['Normal', 'Menipis', 'Habis'];
+        $ownerStockStatusChartValues = [0, 0, 0];
+        $ownerStockStatusSummary = collect();
+        $ownerExpenseCategoryLabels = [];
+        $ownerExpenseCategoryTotals = [];
+        $ownerReceivableStatusChartLabels = ['Belum Lunas', 'Sudah Lunas', 'Lewat Jatuh Tempo'];
+        $ownerReceivableStatusChartValues = [0, 0, 0];
+        $ownerReceivableUnpaidPercent = 0;
+        $ownerReceivableOverduePercent = 0;
+        $ownerReceivableHealthLabel = 'Masih aman';
 
         if ($needsInventoryAnalytics) {
             $decisionWindowStart = $now->copy()->subDays(29)->startOfDay();
@@ -545,6 +558,74 @@ class DasborController extends Controller
         if ($isOwner) {
             $trendStart = $now->copy()->startOfMonth()->subMonths(11);
             $trendEnd = $now->copy()->endOfMonth();
+            $ownerTotalSales = (int) Penjualan::query()->sum('total');
+            $ownerTotalTransactions = (int) Penjualan::query()->count();
+            $ownerTotalUnpaid = (int) Piutang::query()
+                ->where('status', 'belum')
+                ->sum('jumlah');
+            $ownerTotalPaid = (int) Piutang::query()
+                ->where('status', 'lunas')
+                ->sum('jumlah');
+            $ownerOverdueUnpaid = (int) Piutang::query()
+                ->where('status', 'belum')
+                ->whereDate('jatuh_tempo', '<', $today)
+                ->sum('jumlah');
+            $ownerCurrentUnpaid = max($ownerTotalUnpaid - $ownerOverdueUnpaid, 0);
+            $ownerReceivableStatusChartValues = [
+                $ownerCurrentUnpaid,
+                $ownerTotalPaid,
+                $ownerOverdueUnpaid,
+            ];
+            $ownerReceivableStatusTotal = max(array_sum($ownerReceivableStatusChartValues), 1);
+            $ownerReceivableUnpaidPercent = (int) round((($ownerCurrentUnpaid + $ownerOverdueUnpaid) / $ownerReceivableStatusTotal) * 100);
+            $ownerReceivableOverduePercent = (int) round(($ownerOverdueUnpaid / $ownerReceivableStatusTotal) * 100);
+            $ownerReceivableHealthLabel = $ownerReceivableOverduePercent >= 25 ? 'Perlu perhatian' : 'Masih aman';
+
+            $normalStockCount = (int) Produk::query()
+                ->where('aktif', true)
+                ->whereColumn('stok', '>', 'stok_minimum')
+                ->count();
+            $ownerStockStatusChartValues = [
+                $normalStockCount,
+                $lowStockCount,
+                $outOfStockCount,
+            ];
+            $ownerStockStatusSummary = collect([
+                [
+                    'label' => 'Normal',
+                    'count' => $normalStockCount,
+                    'badge' => 'badge-green',
+                    'note' => 'Stok masih di atas batas minimum.',
+                ],
+                [
+                    'label' => 'Menipis',
+                    'count' => $lowStockCount,
+                    'badge' => 'badge-amber',
+                    'note' => 'Perlu dipantau dan disiapkan restok.',
+                ],
+                [
+                    'label' => 'Habis',
+                    'count' => $outOfStockCount,
+                    'badge' => 'badge-red',
+                    'note' => 'Barang tidak tersedia untuk dijual.',
+                ],
+            ]);
+
+            $ownerExpenseByCategory = Pengeluaran::query()
+                ->leftJoin('expense_categories', 'expense_categories.id', '=', 'expenses.expense_category_id')
+                ->selectRaw("COALESCE(expense_categories.nama, 'Tanpa Kategori') as category_name, SUM(expenses.nominal) as total_nominal")
+                ->groupBy('category_name')
+                ->orderByDesc('total_nominal')
+                ->get();
+            $ownerExpenseCategoryLabels = $ownerExpenseByCategory
+                ->pluck('category_name')
+                ->values()
+                ->all();
+            $ownerExpenseCategoryTotals = $ownerExpenseByCategory
+                ->pluck('total_nominal')
+                ->map(fn ($value) => (int) $value)
+                ->values()
+                ->all();
 
             $monthlyPerformance = Penjualan::query()
                 ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as month_key, SUM(total) as total_sales, COUNT(*) as transaction_count")
@@ -627,38 +708,33 @@ class DasborController extends Controller
             $categoryLeader = $categoryLeaders->first();
             if ($peakMonth && $peakMonthLeader) {
                 $decisionHighlights->push([
-                    'title' => 'Musim ramai toko',
-                    'text' => $peakMonthLabel.' menjadi periode omzet tertinggi. Produk terlaris pada periode ini adalah '.$peakMonthLeader->product_name.' dengan penjualan '.number_format($peakMonthLeader->qty_sold, 0, ',', '.').' item.',
-                ]);
-            }
-
-            if ($peakDay && $peakDayLeader) {
-                $decisionHighlights->push([
-                    'title' => 'Hari paling sibuk',
-                    'text' => $peakDayLabel.' mencatat '.number_format($peakDay->transaction_count, 0, ',', '.').' transaksi. Produk yang paling banyak dibeli hari itu adalah '.$peakDayLeader->product_name.'.',
+                    'title' => 'Fokus jual',
+                    'text' => 'Dorong '.$peakMonthLeader->product_name.' karena paling laris pada '.$peakMonthLabel.'.',
                 ]);
             }
 
             if ($restockPriorityCount > 0) {
                 $decisionHighlights->push([
-                    'title' => 'Prioritas pembelian',
-                    'text' => number_format($restockPriorityCount, 0, ',', '.').' produk aktif perlu diprioritaskan untuk restok karena stok menipis atau daya tahannya kurang dari 14 hari.',
+                    'title' => 'Restok segera',
+                    'text' => number_format($restockPriorityCount, 0, ',', '.').' produk perlu dibeli ulang secepatnya.',
                 ]);
             }
 
             if ($slowMoverCount > 0) {
                 $decisionHighlights->push([
-                    'title' => 'Barang lambat laku',
-                    'text' => number_format($slowMoverCount, 0, ',', '.').' produk belum terjual dalam 30 hari terakhir. Item-item ini sebaiknya ditahan pembelian ulangnya atau dipromosikan.',
+                    'title' => 'Tahan pembelian',
+                    'text' => number_format($slowMoverCount, 0, ',', '.').' produk lambat laku dalam 30 hari terakhir.',
                 ]);
             }
 
             if ($categoryLeader) {
                 $decisionHighlights->push([
-                    'title' => 'Kategori penggerak omzet',
-                    'text' => 'Dalam '.$decisionWindowLabel.', kategori '.$categoryLeader->category_name.' memberi kontribusi penjualan terbesar.',
+                    'title' => 'Jaga kategori utama',
+                    'text' => 'Kategori '.$categoryLeader->category_name.' memberi omzet terbesar dalam '.$decisionWindowLabel.'.',
                 ]);
             }
+
+            $decisionHighlights = $decisionHighlights->take(4)->values();
         }
 
         return view('dashboard', compact(
@@ -726,7 +802,20 @@ class DasborController extends Controller
             'overdueReceivablesCount',
             'overdueReceivablesAmount',
             'overdueReceivables',
-            'decisionHighlights'
+            'decisionHighlights',
+            'ownerTotalSales',
+            'ownerTotalTransactions',
+            'ownerTotalUnpaid',
+            'ownerStockStatusChartLabels',
+            'ownerStockStatusChartValues',
+            'ownerStockStatusSummary',
+            'ownerExpenseCategoryLabels',
+            'ownerExpenseCategoryTotals',
+            'ownerReceivableStatusChartLabels',
+            'ownerReceivableStatusChartValues',
+            'ownerReceivableUnpaidPercent',
+            'ownerReceivableOverduePercent',
+            'ownerReceivableHealthLabel'
         ));
     }
 

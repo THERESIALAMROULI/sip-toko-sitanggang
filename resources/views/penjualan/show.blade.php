@@ -68,6 +68,7 @@
                     <thead>
                     <tr>
                         <th>Produk</th>
+                        <th>Harga Beli</th>
                         <th>Harga</th>
                         <th>Qty</th>
                         <th>Subtotal</th>
@@ -75,15 +76,22 @@
                     </thead>
                     <tbody>
                     @forelse ($transaction->details as $detail)
+                        @php
+                            $detailPurchasePrice = (int) ($detail->harga_beli ?? 0);
+                            $detailPurchasePrice = $detailPurchasePrice > 0
+                                ? $detailPurchasePrice
+                                : (int) ($detail->product->harga_beli ?? 0);
+                        @endphp
                         <tr>
                             <td>{{ $detail->product->name ?? '-' }}</td>
+                            <td class="mono">Rp {{ number_format($detailPurchasePrice, 0, ',', '.') }}</td>
                             <td class="mono">Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
                             <td>{{ $detail->quantity }}</td>
-                            <td class="mono">Rp {{ number_format($detail->price * $detail->quantity, 0, ',', '.') }}</td>
+                            <td class="mono">Rp {{ number_format((int) $detail->subtotal, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted">Tidak ada item pada transaksi ini.</td>
+                            <td colspan="5" class="text-center text-muted">Tidak ada item pada transaksi ini.</td>
                         </tr>
                     @endforelse
                     </tbody>

@@ -69,11 +69,12 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($products as $product) {
             $kategoriId = (int) ($kategoriMap[$product['kategori']] ?? 1);
+            $purchasePrice = (int) ($product['harga_beli'] ?? floor(($product['harga_jual'] * 0.8) / 100) * 100);
             DB::table('produks')->updateOrInsert(
                 ['nama' => $product['nama']],
                 [
                     'kategori_id' => $kategoriId,
-                    'harga_beli' => $product['harga_jual'],
+                    'harga_beli' => max(100, $purchasePrice),
                     'harga_jual' => $product['harga_jual'],
                     'stok' => $product['stok'],
                     'stok_minimum' => 10,

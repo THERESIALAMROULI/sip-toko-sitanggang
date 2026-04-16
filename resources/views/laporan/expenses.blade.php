@@ -50,61 +50,32 @@
             <div class="sc-value mono">Rp {{ number_format($totalSales, 0, ',', '.') }}</div>
             <div class="sc-sub">{{ number_format($totalTransactions, 0, ',', '.') }} transaksi</div>
         </div>
-        <div class="stat-card {{ $netProfit >= 0 ? 'sc-blue' : 'sc-amber' }}">
-            <div class="sc-label">Laba / Rugi</div>
-            <div class="sc-value mono">Rp {{ number_format($netProfit, 0, ',', '.') }}</div>
-            <div class="sc-sub">{{ $netProfit >= 0 ? 'Laba periode terfilter' : 'Rugi periode terfilter' }}</div>
+        <div class="stat-card sc-blue">
+            <div class="sc-label">Laba Bersih</div>
+            <div class="sc-value mono">Rp {{ number_format(max($netProfit, 0), 0, ',', '.') }}</div>
+            <div class="sc-sub">Sisa penjualan setelah dikurangi biaya</div>
+        </div>
+        <div class="stat-card sc-amber">
+            <div class="sc-label">Rugi</div>
+            <div class="sc-value mono">Rp {{ number_format(abs(min($netProfit, 0)), 0, ',', '.') }}</div>
+            <div class="sc-sub">Muncul saat biaya lebih besar dari penjualan</div>
         </div>
     </div>
-    <div class="grid-2">
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Komposisi Biaya per Kategori</div>
-            </div>
-            <div class="card-body">
-                @if ($expenseByCategory->isEmpty())
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Belum ada data biaya untuk ditampilkan.</p>
-                    </div>
-                @else
-                    <canvas id="expenseCategoryChart" height="120"></canvas>
-                @endif
-            </div>
+    <div class="card">
+        <div class="card-hd">
+            <div class="card-title">Pembagian Pengeluaran</div>
         </div>
-        <div class="card">
-            <div class="card-hd">
-                <div class="card-title">Ringkasan Kategori</div>
-            </div>
-            <div class="card-body">
-                @if ($expenseByCategory->isEmpty())
-                    <div class="empty-state">
-                        <div class="es-icon">-</div>
-                        <p>Tidak ada ringkasan kategori.</p>
-                    </div>
-                @else
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Kategori</th>
-                                <th>Nominal</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($expenseByCategory as $label => $value)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $label }}</td>
-                                    <td class="mono">Rp {{ number_format($value, 0, ',', '.') }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </div>
+        <div class="card-body">
+            @if ($expenseByCategory->isEmpty())
+                <div class="empty-state">
+                    <div class="es-icon">-</div>
+                    <p>Belum ada data biaya untuk ditampilkan.</p>
+                </div>
+            @else
+                <div style="max-width: 240px; margin: 0 auto;">
+                    <canvas id="expenseCategoryChart" height="90"></canvas>
+                </div>
+            @endif
         </div>
     </div>
     <div class="card">

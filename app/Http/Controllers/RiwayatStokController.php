@@ -30,9 +30,27 @@ class RiwayatStokController extends Controller
         if (! empty($validated['end_date'])) {
             $stokHistoriesQuery->where('tanggal', '<=', $validated['end_date'].' 23:59:59');
         }
-        $stokHistories = $stokHistoriesQuery
+        $perPage = 5;
+        $orderedHistoriesQuery = (clone $stokHistoriesQuery)
             ->orderByDesc('tanggal')
-            ->get();
+            ->with(['produk', 'supplier', 'user']);
+        $incomingSupplierHistories = (clone $orderedHistoriesQuery)
+            ->where('jumlah', '>', 0)
+            ->paginate($perPage, ['*'], 'incoming_page')
+            ->withQueryString();
+        $salesOutgoingHistories = (clone $orderedHistoriesQuery)
+            ->where('jumlah', '<', 0)
+            ->where('keterangan', 'like', 'Penjualan #%')
+            ->paginate($perPage, ['*'], 'sales_page')
+            ->withQueryString();
+        $supplierOutgoingHistories = (clone $orderedHistoriesQuery)
+            ->where('jumlah', '<', 0)
+            ->where(function ($query) {
+                $query->whereNull('keterangan')
+                    ->orWhere('keterangan', 'not like', 'Penjualan #%');
+            })
+            ->paginate($perPage, ['*'], 'supplier_outgoing_page')
+            ->withQueryString();
         $products = Produk::query()
             ->orderBy('nama')
             ->get();
@@ -46,7 +64,14 @@ class RiwayatStokController extends Controller
             'start_date' => $validated['start_date'] ?? null,
             'end_date' => $validated['end_date'] ?? null,
         ];
-        return view('stok_histories.index', compact('stokHistories', 'products', 'suppliers', 'filters'));
+        return view('stok_histories.index', compact(
+            'incomingSupplierHistories',
+            'salesOutgoingHistories',
+            'supplierOutgoingHistories',
+            'products',
+            'suppliers',
+            'filters'
+        ));
     }
     public function create()
     {
@@ -73,6 +98,11 @@ class RiwayatStokController extends Controller
 
     public function createCorrection(RiwayatStok $stokHistory)
     {
+        if ((int) $stokHistory->jumlah < 0 && str_starts_with((string) $stokHistory->keterangan, 'Penjualan #')) {
+            return redirect()->route('stok_histories.index')
+                ->with('error', 'Riwayat stok keluar dari penjualan tidak bisa diedit. Buat transaksi baru atau koreksi stok terpisah bila diperlukan.');
+        }
+
         $products = Produk::query()
             ->where(function ($query) use ($stokHistory) {
                 $query->where('aktif', true)

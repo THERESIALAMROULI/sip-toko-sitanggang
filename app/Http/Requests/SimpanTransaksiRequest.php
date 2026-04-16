@@ -22,7 +22,7 @@ class SimpanTransaksiRequest extends FormRequest
             'cash_received' => ['nullable', 'numeric', 'min:0', 'required_if:payment_type,tunai'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.product_id' => ['required', 'exists:produks,id', 'distinct'],
-            'products.*.quantity' => ['required', 'integer', 'min:0'],
+            'products.*.quantity' => ['nullable', 'integer', 'min:0'],
         ];
     }
     public function withValidator(Validator $validator): void

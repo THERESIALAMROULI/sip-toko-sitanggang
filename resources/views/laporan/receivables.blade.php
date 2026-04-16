@@ -64,6 +64,71 @@
             <div class="sc-sub">Perlu ditindaklanjuti</div>
         </div>
     </div>
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-hd">
+                <div class="card-title">Grafik Status Piutang</div>
+            </div>
+            <div class="card-body">
+                @if (array_sum($receivableStatusChartValues) === 0)
+                    <div class="empty-state">
+                        <div class="es-icon">-</div>
+                        <p>Belum ada data piutang untuk divisualisasikan.</p>
+                    </div>
+                @else
+                    <div class="stock-report-chart-layout">
+                        <div class="stock-report-chart-wrap">
+                            <canvas id="receivableStatusChart" height="170"></canvas>
+                        </div>
+                        <div class="stock-report-status-list">
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-amber">Belum Lunas</span>
+                                    <div class="stock-report-status-count">Rp {{ number_format($currentUnpaid, 0, ',', '.') }}</div>
+                                </div>
+                            </div>
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-green">Sudah Lunas</span>
+                                    <div class="stock-report-status-count">Rp {{ number_format($totalPaid, 0, ',', '.') }}</div>
+                                </div>
+                            </div>
+                            <div class="stock-report-status-item">
+                                <div class="stock-report-status-main">
+                                    <span class="badge badge-red">Lewat Jatuh Tempo</span>
+                                    <div class="stock-report-status-count">Rp {{ number_format($overdueUnpaid, 0, ',', '.') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-hd">
+                <div class="card-title">Insight Piutang</div>
+            </div>
+            <div class="card-body">
+                <div class="insight-list">
+                    <div class="insight-item">
+                        <div class="insight-eyebrow">Piutang Belum Lunas</div>
+                        <div class="insight-main">{{ $receivableUnpaidPercent }}%</div>
+                        <div class="insight-sub">Masih menjadi tagihan yang belum selesai.</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-eyebrow">Lewat Jatuh Tempo</div>
+                        <div class="insight-main">{{ $receivableOverduePercent }}%</div>
+                        <div class="insight-sub">Perlu ditagih lebih dulu agar arus kas aman.</div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-eyebrow">Kondisi Keuangan</div>
+                        <div class="insight-main">{{ $receivableHealthLabel }}</div>
+                        <div class="insight-sub">Dilihat dari porsi piutang yang sudah melewati jatuh tempo.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-hd">
             <div class="card-title">Detail Piutang</div>
@@ -117,6 +182,7 @@
 </div>
 @endsection
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -138,6 +204,39 @@
         }
     };
     const formatRupiahReceivable = (value) => `Rp ${new Intl.NumberFormat('id-ID').format(Number(value || 0))}`;
+    const receivableChartCanvas = document.getElementById('receivableStatusChart');
+    if (receivableChartCanvas && {{ array_sum($receivableStatusChartValues) }} > 0) {
+        new Chart(receivableChartCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {!! json_encode($receivableStatusChartLabels) !!},
+                datasets: [{
+                    data: {!! json_encode($receivableStatusChartValues) !!},
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.82)',
+                        'rgba(16, 185, 129, 0.82)',
+                        'rgba(239, 68, 68, 0.82)'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.label}: ${formatRupiahReceivable(ctx.raw)}`
+                        }
+                    }
+                }
+            }
+        });
+    }
     const createExcelSheet = (title, headers, rows, summaryRows = []) => {
         const aoa = [[title], []];
         summaryRows.forEach((row) => aoa.push(row));

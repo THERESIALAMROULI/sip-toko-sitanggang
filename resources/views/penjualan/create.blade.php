@@ -74,6 +74,7 @@
                         <tr>
                             <th>No</th>
                             <th>Produk</th>
+                            <th>Harga Beli</th>
                             <th>Harga Jual</th>
                             <th>Stok</th>
                             <th>Qty</th>
@@ -85,6 +86,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $product->name }}</td>
+                                <td class="mono">Rp {{ number_format((int) $product->harga_beli, 0, ',', '.') }}</td>
                                 <td class="mono">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                                 <td>
                                     @if ($product->stock <= 0)
@@ -106,7 +108,7 @@
                                         name="products[{{ $index }}][quantity]"
                                         min="0"
                                         max="{{ $product->stock }}"
-                                        value="{{ old('products.'.$index.'.quantity', 0) }}"
+                                        value="{{ old('products.'.$index.'.quantity', '') }}"
                                         class="form-control js-qty-input"
                                         data-price="{{ $product->price }}"
                                         @readonly($product->stock <= 0)
