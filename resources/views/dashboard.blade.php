@@ -50,8 +50,8 @@
                 <div class="card-title">Tren Penjualan</div>
                 <span class="badge badge-gray">12 bulan</span>
             </div>
-            <div class="card-body">
-                <canvas id="salesTrendChart" height="120"></canvas>
+            <div class="card-body owner-trend-chart-body">
+                <canvas id="salesTrendChart" height="260"></canvas>
             </div>
         </div>
         <div class="card">
@@ -309,49 +309,6 @@
                 @endif
             </div>
 
-            <div class="admin-focus-panel" data-admin-focus-panel="category" hidden>
-                @if ($adminCategoryCheckProducts->isEmpty())
-                    <div class="empty-state admin-focus-empty">
-                        <div class="es-icon">-</div>
-                        <p>Belum ada produk yang perlu dicek.</p>
-                    </div>
-                @else
-                    @php $categoryPages = $adminCategoryCheckProducts->chunk(10); @endphp
-                    <div class="table-sub mb-2" data-admin-page-summary data-total="{{ $adminCategoryCheckProducts->count() }}" data-label="produk">
-                        Menampilkan <span data-admin-page-start>1</span>-<span data-admin-page-end>{{ min(10, $adminCategoryCheckProducts->count()) }}</span> dari {{ $adminCategoryCheckProducts->count() }} produk.
-                    </div>
-                    @foreach ($categoryPages as $pageIndex => $productsPage)
-                        <div class="admin-item-list admin-item-page" data-admin-page="{{ $pageIndex + 1 }}" @if ($pageIndex > 0) hidden @endif>
-                            @foreach ($productsPage as $product)
-                                @php
-                                    $statusLabel = (int) $product->stok <= 0 ? 'Habis' : 'Menipis';
-                                    $statusBadge = (int) $product->stok <= 0 ? 'badge-red' : 'badge-amber';
-                                @endphp
-                                <div class="admin-item-row">
-                                    <div class="admin-item-main">
-                                        <div class="admin-item-title">{{ $product->nama }}</div>
-                                        <div class="table-sub">{{ $product->category_name ?? '-' }}</div>
-                                    </div>
-                                    <div class="admin-item-meta">
-                                        <span class="badge {{ $statusBadge }}">{{ $statusLabel }}</span>
-                                        <span class="badge badge-gray">Stok {{ number_format($product->stok, 0, ',', '.') }}</span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endforeach
-                    @if ($categoryPages->count() > 1)
-                        <div class="admin-panel-footer">
-                            <div class="table-sub" data-admin-page-status>Halaman 1 dari {{ $categoryPages->count() }}</div>
-                            <div class="admin-panel-nav">
-                                <button type="button" class="btn btn-secondary btn-sm" data-admin-page-prev disabled>Sebelumnya</button>
-                                <button type="button" class="btn btn-secondary btn-sm" data-admin-page-next>Selanjutnya</button>
-                            </div>
-                        </div>
-                    @endif
-                @endif
-            </div>
-
         </div>
     </div>
 
@@ -533,8 +490,8 @@
                     datasets: [{
                         label: 'Penjualan',
                         data: {!! json_encode($adminSalesChartValues) !!},
-                        borderColor: 'rgba(28, 77, 141, 1)',
-                        backgroundColor: 'rgba(73, 136, 196, 0.14)',
+                        borderColor: 'rgba(15, 118, 110, 1)',
+                        backgroundColor: 'rgba(20, 184, 166, 0.14)',
                         fill: true,
                         tension: 0.32
                     }]
@@ -568,7 +525,7 @@
                             'rgba(239, 68, 68, 0.82)',
                             'rgba(245, 158, 11, 0.82)',
                             'rgba(16, 185, 129, 0.82)',
-                            'rgba(28, 77, 141, 0.82)'
+                            'rgba(37, 99, 235, 0.82)'
                         ],
                         borderColor: '#ffffff',
                         borderWidth: 1
@@ -721,8 +678,8 @@
                     datasets: [{
                         label: 'Omzet Penjualan',
                         data: {!! json_encode($salesTrendValues) !!},
-                        borderColor: 'rgba(28, 77, 141, 1)',
-                        backgroundColor: 'rgba(73, 136, 196, 0.14)',
+                        borderColor: 'rgba(15, 118, 110, 1)',
+                        backgroundColor: 'rgba(20, 184, 166, 0.14)',
                         fill: true,
                         tension: 0.3
                     }]
@@ -733,7 +690,11 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            min: 0,
+                            max: 6000000,
                             ticks: {
+                                stepSize: 800000,
+                                includeBounds: true,
                                 callback: (value) => formatRupiah(value)
                             }
                         }
@@ -779,8 +740,8 @@
                     datasets: [{
                         data: {!! json_encode($ownerExpenseCategoryTotals) !!},
                         backgroundColor: [
-                            'rgba(28, 77, 141, 0.82)',
-                            'rgba(73, 136, 196, 0.82)',
+                            'rgba(15, 118, 110, 0.82)',
+                            'rgba(37, 99, 235, 0.82)',
                             'rgba(245, 158, 11, 0.82)',
                             'rgba(16, 185, 129, 0.82)',
                             'rgba(239, 68, 68, 0.82)',

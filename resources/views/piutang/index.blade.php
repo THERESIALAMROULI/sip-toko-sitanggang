@@ -12,17 +12,10 @@
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('receivables.index') }}" class="form-grid">
+                <input type="hidden" name="group" value="{{ $selectedReceivableGroup !== 'all' ? $selectedReceivableGroup : '' }}">
                 <div class="field">
                     <label for="q">Cari</label>
                     <input id="q" type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="ID transaksi / nama pelanggan">
-                </div>
-                <div class="field">
-                    <label for="status">Status</label>
-                    <select id="status" name="status">
-                        <option value="">Semua</option>
-                        <option value="unpaid" @selected(($filters['status'] ?? null) === 'unpaid')>Belum Lunas</option>
-                        <option value="paid" @selected(($filters['status'] ?? null) === 'paid')>Lunas</option>
-                    </select>
                 </div>
                 <div class="field">
                     <label for="customer_id">Pelanggan</label>
@@ -35,16 +28,9 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="field">
-                    <label for="overdue_only">Lewat Jatuh Tempo</label>
-                    <select id="overdue_only" name="overdue_only">
-                        <option value="">Semua</option>
-                        <option value="1" @selected(($filters['overdue_only'] ?? null) === '1')>Hanya yang lewat tempo</option>
-                    </select>
-                </div>
                 <div class="td-actions field-full">
                     <button type="submit" class="btn btn-primary">Terapkan</button>
-                    <a href="{{ route('receivables.index') }}" class="btn btn-secondary">Reset</a>
+                    <a href="{{ route('receivables.index', ['group' => $selectedReceivableGroup !== 'all' ? $selectedReceivableGroup : null]) }}" class="btn btn-secondary">Reset</a>
                 </div>
             </form>
         </div>
@@ -71,10 +57,24 @@
             <div class="card-title">Daftar Piutang</div>
             <span class="badge badge-blue">{{ $receivables->count() }} data</span>
         </div>
-        <div class="card-body">
+        <div class="card-body stack-md">
             <p class="form-hint mb-3">
                 Piutang dibuat otomatis dari transaksi utang.
             </p>
+            <div class="product-group-tabs">
+                @foreach ($receivableGroups as $group)
+                    <a
+                        href="{{ route('receivables.index', [
+                            'group' => $group['key'] !== 'all' ? $group['key'] : null,
+                            'q' => ! empty($filters['q']) ? $filters['q'] : null,
+                            'customer_id' => ! empty($filters['customer_id']) ? $filters['customer_id'] : null,
+                        ]) }}"
+                        class="btn {{ $selectedReceivableGroup === $group['key'] ? 'btn-primary' : 'btn-secondary' }}"
+                    >
+                        {{ $group['label'] }} ({{ number_format($group['count'], 0, ',', '.') }})
+                    </a>
+                @endforeach
+            </div>
             @if ($receivables->isEmpty())
                 <div class="empty-state">
                     <div class="es-icon">-</div>

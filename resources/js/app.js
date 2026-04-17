@@ -163,3 +163,79 @@ const applyCustomValidity = (event) => {
 document.addEventListener('input', resetCustomValidity, true);
 document.addEventListener('change', resetCustomValidity, true);
 document.addEventListener('invalid', applyCustomValidity, true);
+
+const prefetchableSelectors = [
+    '.sb-nav a[href]',
+    '.content-area a[href]',
+].join(', ');
+
+const prefetchedUrls = new Set();
+
+const canPrefetch = (anchor) => {
+    if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) {
+        return false;
+    }
+
+    const url = new URL(anchor.href, window.location.href);
+
+    return url.origin === window.location.origin
+        && url.protocol.startsWith('http')
+        && url.href !== window.location.href
+        && !url.hash
+        && !prefetchedUrls.has(url.href);
+};
+
+const prefetchPage = (anchor) => {
+    if (!canPrefetch(anchor)) {
+        return;
+    }
+
+    const url = new URL(anchor.href, window.location.href);
+    prefetchedUrls.add(url.href);
+
+    window.fetch(url.href, {
+        credentials: 'same-origin',
+        headers: {
+            Accept: 'text/html',
+            'X-Page-Prefetch': '1',
+        },
+        priority: 'low',
+    }).catch(() => {
+        prefetchedUrls.delete(url.href);
+    });
+};
+
+const registerPagePrefetch = () => {
+    const layout = document.querySelector('.layout');
+
+    if (!layout || window.matchMedia('(prefers-reduced-data: reduce)').matches || navigator.connection?.saveData) {
+        return;
+    }
+
+    document.querySelectorAll(prefetchableSelectors).forEach((anchor) => {
+        anchor.addEventListener('pointerenter', () => prefetchPage(anchor), { once: true, passive: true });
+        anchor.addEventListener('focus', () => prefetchPage(anchor), { once: true });
+        anchor.addEventListener('touchstart', () => prefetchPage(anchor), { once: true, passive: true });
+    });
+
+    const warmSidebarLinks = () => {
+        Array.from(document.querySelectorAll('.sb-nav a[href]'))
+            .filter(canPrefetch)
+            .slice(0, 6)
+            .forEach((anchor, index) => {
+                window.setTimeout(() => prefetchPage(anchor), 250 * index);
+            });
+    };
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(warmSidebarLinks, { timeout: 2500 });
+    } else {
+        window.setTimeout(warmSidebarLinks, 1200);
+    }
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerPagePrefetch, { once: true });
+} else {
+    registerPagePrefetch();
+}

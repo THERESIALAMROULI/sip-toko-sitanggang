@@ -10,26 +10,35 @@ class PiutangController extends Controller
     {
         $validated = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
+            'group' => ['nullable', 'in:all,paid,overdue'],
             'status' => ['nullable', 'in:unpaid,paid'],
             'customer_id' => ['nullable', 'exists:pelanggans,id'],
             'overdue_only' => ['nullable', 'in:1'],
         ]);
+        $selectedReceivableGroup = $validated['group'] ?? null;
+        if ($selectedReceivableGroup === null) {
+            $selectedReceivableGroup = ! empty($validated['overdue_only'])
+                ? 'overdue'
+                : (($validated['status'] ?? null) === 'paid' ? 'paid' : 'all');
+        }
+
         $receivablesQuery = Piutang::query()
             ->with('transaction.customer');
         // Filter membantu kasir memantau piutang berdasarkan status, pelanggan, dan jatuh tempo.
-        if (! empty($validated['status'])) {
-            $receivablesQuery->where('status', $validated['status'] === 'paid' ? 'lunas' : 'belum');
+        if ($selectedReceivableGroup === 'paid') {
+            $receivablesQuery->where('status', 'lunas');
+        } elseif ($selectedReceivableGroup === 'overdue') {
+            $receivablesQuery
+                ->where('status', 'belum')
+                ->whereDate('jatuh_tempo', '<', now()->toDateString());
+        } elseif (! empty($validated['status']) && $validated['status'] === 'unpaid') {
+            $receivablesQuery->where('status', 'belum');
         }
         if (! empty($validated['customer_id'])) {
             $customerId = (int) $validated['customer_id'];
             $receivablesQuery->whereHas('transaction', function ($query) use ($customerId) {
                 $query->where('pelanggan_id', $customerId);
             });
-        }
-        if (! empty($validated['overdue_only'])) {
-            $receivablesQuery
-                ->where('status', 'belum')
-                ->whereDate('jatuh_tempo', '<', now()->toDateString());
         }
         if (! empty($validated['q'])) {
             $search = trim($validated['q']);
@@ -49,6 +58,26 @@ class PiutangController extends Controller
         $customers = Pelanggan::query()
             ->orderBy('nama')
             ->get();
+        $receivableGroups = collect([
+            [
+                'key' => 'all',
+                'label' => 'Semua',
+                'count' => Piutang::query()->count(),
+            ],
+            [
+                'key' => 'paid',
+                'label' => 'Lunas',
+                'count' => Piutang::query()->where('status', 'lunas')->count(),
+            ],
+            [
+                'key' => 'overdue',
+                'label' => 'Jatuh Tempo',
+                'count' => Piutang::query()
+                    ->where('status', 'belum')
+                    ->whereDate('jatuh_tempo', '<', now()->toDateString())
+                    ->count(),
+            ],
+        ]);
         // Ringkasan ini dipakai untuk menunjukkan total piutang aktif, jatuh tempo, dan jumlah yang sudah lunas.
         $summaryUnpaidAmount = $receivables
             ->where('status', 'unpaid')
@@ -63,6 +92,7 @@ class PiutangController extends Controller
             ->count();
         $filters = [
             'q' => $validated['q'] ?? null,
+            'group' => $selectedReceivableGroup,
             'status' => $validated['status'] ?? null,
             'customer_id' => $validated['customer_id'] ?? null,
             'overdue_only' => $validated['overdue_only'] ?? null,
@@ -70,6 +100,8 @@ class PiutangController extends Controller
         return view('piutang.index', compact(
             'receivables',
             'customers',
+            'receivableGroups',
+            'selectedReceivableGroup',
             'summaryUnpaidAmount',
             'summaryOverdueAmount',
             'summaryPaidCount',

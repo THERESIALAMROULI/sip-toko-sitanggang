@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\PeranMiddleware::class,
+            'page.cache' => \App\Http\Middleware\CachePageResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

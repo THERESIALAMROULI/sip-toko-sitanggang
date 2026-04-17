@@ -132,7 +132,6 @@ class DasborController extends Controller
         $slowMoverCount = 0;
         $slowMovingProducts = collect();
         $decisionHighlights = collect();
-        $adminCategoryCheckProducts = collect();
         $ownerTotalSales = 0;
         $ownerTotalTransactions = 0;
         $ownerTotalUnpaid = 0;
@@ -359,27 +358,6 @@ class DasborController extends Controller
             $restockPriorityCount = $adminInventoryAnalytics['restock_priority_count'];
             $restockPriorities = $adminInventoryAnalytics['restock_priorities'];
             $categoryStockAlerts = $adminInventoryAnalytics['category_stock_alerts'];
-            $topCategoryAlert = $categoryStockAlerts->first();
-            $adminCategoryCheckProducts = $topCategoryAlert
-                ? $adminPeriodProducts
-                    ->filter(function ($product) use ($topCategoryAlert) {
-                        $needsAttention = (int) $product->stok <= 0
-                            || ((int) $product->stok > 0 && (int) $product->stok <= (int) $product->stok_minimum);
-
-                        return $needsAttention && ($product->category_name ?? 'Tanpa Kategori') === $topCategoryAlert->category_name;
-                    })
-                    ->sort(function ($a, $b) {
-                        $statusA = (int) $a->stok <= 0 ? 0 : 1;
-                        $statusB = (int) $b->stok <= 0 ? 0 : 1;
-                        $statusCompare = $statusA <=> $statusB;
-                        if ($statusCompare !== 0) {
-                            return $statusCompare;
-                        }
-
-                        return (int) $a->stok <=> (int) $b->stok;
-                    })
-                    ->values()
-                : collect();
 
             $recentMutations = RiwayatStok::query()
                 ->with(['produk', 'supplier', 'user'])
@@ -532,24 +510,6 @@ class DasborController extends Controller
                     'text' => 'Perputaran barang masih sehat pada periode ini.',
                     'tone' => 'blue',
                     'target' => 'slow',
-                ]);
-            }
-
-            if ($topCategoryAlert) {
-                $adminHighlights->push([
-                    'title' => 'Kategori Perlu Dicek',
-                    'metric' => number_format($adminCategoryCheckProducts->count(), 0, ',', '.').' produk',
-                    'text' => $topCategoryAlert->category_name.' paling banyak butuh perhatian stok.',
-                    'tone' => 'blue',
-                    'target' => 'category',
-                ]);
-            } else {
-                $adminHighlights->push([
-                    'title' => 'Kategori Perlu Dicek',
-                    'metric' => 'Tidak Ada',
-                    'text' => 'Belum ada kategori yang sedang banyak bermasalah.',
-                    'tone' => 'green',
-                    'target' => 'category',
                 ]);
             }
 
@@ -798,7 +758,6 @@ class DasborController extends Controller
             'restockPriorities',
             'slowMoverCount',
             'slowMovingProducts',
-            'adminCategoryCheckProducts',
             'overdueReceivablesCount',
             'overdueReceivablesAmount',
             'overdueReceivables',

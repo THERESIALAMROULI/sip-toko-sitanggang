@@ -59,6 +59,7 @@ class PenjualanController extends Controller
     public function create()
     {
         $products = Produk::query()
+            ->with('kategori')
             ->orderBy('nama')
             ->get();
         $customers = Pelanggan::query()

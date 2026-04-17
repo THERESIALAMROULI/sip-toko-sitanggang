@@ -333,14 +333,15 @@
                 'Ringkasan Laporan Penjualan',
                 ['Keterangan', 'Nilai'],
                 [
-                    ['Periode Aktif', salesExportData.summary.currentPeriodLabel],
-                    ['Periode Pembanding', salesExportData.summary.comparisonPeriodLabel || '-'],
-                    ['Total Omzet', salesExportData.summary.totalSales],
-                    ['Untung Penjualan', salesExportData.summary.totalProfit],
-                    ['Total Barang Terjual', salesExportData.summary.totalItemsSold],
-                    ['Rata-rata Transaksi', salesExportData.summary.averagePerTransaction],
-                    ['Penjualan Utang', salesExportData.summary.creditSales],
-                    ['Selisih Penjualan', salesExportData.summary.comparisonPeriodLabel ? salesExportData.summary.salesDifferenceAmount : '-']
+	                    ['Periode Aktif', salesExportData.summary.currentPeriodLabel],
+	                    ['Periode Pembanding', salesExportData.summary.comparisonPeriodLabel || '-'],
+	                    ['Total Omzet Aktif', salesExportData.summary.totalSales],
+	                    ['Omzet Pembanding', salesExportData.summary.comparisonPeriodLabel ? salesExportData.summary.comparisonTotalSales : '-'],
+	                    ['Untung Penjualan', salesExportData.summary.totalProfit],
+	                    ['Total Barang Terjual', salesExportData.summary.totalItemsSold],
+	                    ['Rata-rata Transaksi', salesExportData.summary.averagePerTransaction],
+	                    ['Penjualan Utang', salesExportData.summary.creditSales],
+	                    ['Selisih Penjualan', salesExportData.summary.comparisonPeriodLabel ? salesExportData.summary.salesDifferenceAmount : '-']
                 ]
             );
 
@@ -381,27 +382,52 @@
 
     const pdfBtn = document.getElementById('exportSalesPdf');
     if (pdfBtn) {
-        pdfBtn.addEventListener('click', () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape' });
-            doc.setFontSize(14);
-            doc.text('Laporan Penjualan', 14, 14);
-            doc.setFontSize(10);
-            doc.text(`Periode Aktif: ${salesExportData.summary.currentPeriodLabel}`, 14, 22);
-            doc.text(`Periode Pembanding: ${salesExportData.summary.comparisonPeriodLabel || '-'}`, 14, 28);
-            doc.text(`Total Omzet: ${formatRupiah(salesExportData.summary.totalSales)}`, 14, 34);
-            doc.text(`Untung Penjualan: ${formatRupiah(salesExportData.summary.totalProfit)}`, 14, 40);
-            doc.text(`Total Barang Terjual: ${salesExportData.summary.totalItemsSold}`, 14, 46);
-            doc.text(`Rata-rata Transaksi: ${formatRupiah(salesExportData.summary.averagePerTransaction)}`, 14, 52);
-            doc.text(`Jumlah Transaksi: ${salesExportData.summary.totalTransactions}`, 150, 34);
-            doc.text(`Penjualan Utang: ${formatRupiah(salesExportData.summary.creditSales)}`, 150, 40);
-            doc.text(`Selisih Penjualan: ${salesExportData.summary.comparisonPeriodLabel ? formatRupiah(salesExportData.summary.salesDifferenceAmount) : '-'}`, 150, 46);
+	        pdfBtn.addEventListener('click', () => {
+	            const { jsPDF } = window.jspdf;
+	            const doc = new jsPDF({ orientation: 'landscape' });
+	            const hasComparisonPeriod = Boolean(salesExportData.summary.comparisonPeriodLabel);
+	            const summaryRows = [
+	                ['Periode Aktif', salesExportData.summary.currentPeriodLabel, 'Periode Pembanding', salesExportData.summary.comparisonPeriodLabel || '-'],
+	                ['Total Omzet Aktif', formatRupiah(salesExportData.summary.totalSales), 'Omzet Pembanding', hasComparisonPeriod ? formatRupiah(salesExportData.summary.comparisonTotalSales) : '-'],
+	                ['Selisih Penjualan', hasComparisonPeriod ? formatRupiah(salesExportData.summary.salesDifferenceAmount) : '-', 'Jumlah Transaksi', salesExportData.summary.totalTransactions],
+	                ['Untung Penjualan', formatRupiah(salesExportData.summary.totalProfit), 'Penjualan Utang', formatRupiah(salesExportData.summary.creditSales)],
+	                ['Total Barang Terjual', salesExportData.summary.totalItemsSold, 'Rata-rata Transaksi', formatRupiah(salesExportData.summary.averagePerTransaction)]
+	            ];
 
-            doc.autoTable({
-                startY: 60,
-                head: [['No', 'Tanggal', 'ID Transaksi', 'Pembeli', 'Produk', 'Kategori', 'Jumlah', 'Total Harga', 'Status']],
-                body: salesExportData.details.map((item, index) => [
-                    index + 1,
+	            doc.setFontSize(14);
+	            doc.text('Laporan Penjualan', 14, 14);
+	            doc.setFontSize(10);
+	            doc.text('Selisih Penjualan = Total Omzet Aktif - Omzet Pembanding', 14, 21);
+
+	            doc.autoTable({
+	                startY: 26,
+	                head: [['Keterangan', 'Nilai', 'Keterangan', 'Nilai']],
+	                body: summaryRows,
+	                theme: 'grid',
+	                styles: {
+	                    fontSize: 9,
+	                    cellPadding: 2.8,
+	                    lineColor: [220, 226, 232],
+	                    lineWidth: 0.1
+	                },
+	                headStyles: {
+	                    fillColor: [15, 118, 110],
+	                    textColor: [255, 255, 255],
+	                    fontStyle: 'bold'
+	                },
+	                columnStyles: {
+	                    0: { fontStyle: 'bold', cellWidth: 46 },
+	                    1: { cellWidth: 82 },
+	                    2: { fontStyle: 'bold', cellWidth: 46 },
+	                    3: { cellWidth: 82 }
+	                }
+	            });
+
+	            doc.autoTable({
+	                startY: doc.lastAutoTable.finalY + 8,
+	                head: [['No', 'Tanggal', 'ID Transaksi', 'Pembeli', 'Produk', 'Kategori', 'Jumlah', 'Total Harga', 'Status']],
+	                body: salesExportData.details.map((item, index) => [
+	                    index + 1,
                     item.date,
                     item.invoice,
                     item.customer,
@@ -411,8 +437,10 @@
                     formatRupiah(item.total),
                     item.status
                 ]),
-                styles: { fontSize: 8 }
-            });
+	                styles: { fontSize: 8 },
+	                headStyles: { fillColor: [15, 118, 110] },
+	                alternateRowStyles: { fillColor: [248, 250, 252] }
+	            });
 
             doc.addPage('a4', 'landscape');
             doc.setFontSize(14);
@@ -427,8 +455,10 @@
                     item.qty,
                     formatRupiah(item.total)
                 ]),
-                styles: { fontSize: 8 }
-            });
+	                styles: { fontSize: 8 },
+	                headStyles: { fillColor: [15, 118, 110] },
+	                alternateRowStyles: { fillColor: [248, 250, 252] }
+	            });
 
             doc.save('laporan-penjualan.pdf');
         });
@@ -444,8 +474,8 @@
                     {
                         label: 'Total Omzet',
                         data: salesExportData.chart.currentTotals,
-                        backgroundColor: 'rgba(28, 77, 141, 0.82)',
-                        borderColor: 'rgba(15, 40, 84, 1)',
+                        backgroundColor: 'rgba(15, 118, 110, 0.82)',
+                        borderColor: 'rgba(18, 67, 61, 1)',
                         borderWidth: 1,
                         borderRadius: 6
                     }
